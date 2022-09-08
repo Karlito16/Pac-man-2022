@@ -7,6 +7,7 @@ import itertools
 from .grid_slot_type import GridSlotType
 from .map_particles import MapParticles
 from .node_type import NodeType
+from .nodes import Nodes
 from src.utils import Directions, ParticleContainer, DIRECTIONS_COORDINATES_DIFFERENCE
 
 
@@ -26,6 +27,7 @@ class Grid(dict):
         self._init_grid()
         self._enable_editing = False
         self._init_neighbours()
+        self._nodes = Nodes()
 
     def __setitem__(self, key, value):
         """Disables any changes to the original grid."""
@@ -48,6 +50,11 @@ class Grid(dict):
     def cols(self):
         """Getter."""
         return self._cols
+
+    @property
+    def nodes(self):
+        """Getter."""
+        return self._nodes
 
     def _init_grid(self):
         """Creates the grid with the grid slots."""
@@ -91,17 +98,22 @@ class Grid(dict):
                     node.grid_slots.add(grid_slot)  # one of the four grid slots becomes a part of the one node
         return
 
+    def _create_node(self, i, j, type_, class_):
+        """Wrapper method for creating a node/big node."""
+        node = self._nodes.get_node(i=i, j=j)
+        if not node:
+            node = class_(i=i, j=j, type_=type_)
+            self.define_grid_slots_for_node(node=node)
+            self._nodes.add_node(node=node)
+        return node
+
     def create_node(self, i, j, type_):
         """Converts grid slots into a node."""
-        node = MapParticles.Node(i=i, j=j, type_=type_)
-        self.define_grid_slots_for_node(node=node)
-        return node
+        return self._create_node(i=i, j=j, type_=type_, class_=MapParticles.Node)
 
     def create_big_node(self, i, j, type_):
         """Converts grid slots into a big node."""
-        big_node = MapParticles.BigNode(i=i, j=j, type_=type_)
-        self.define_grid_slots_for_node(node=big_node)
-        return big_node
+        return self._create_node(i=i, j=j, type_=type_, class_=MapParticles.BigNode)
 
     @staticmethod
     def _get_sub_nodes_type(from_node_type, to_node_type):

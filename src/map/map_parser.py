@@ -4,7 +4,7 @@
 
 
 import src.utils as utils
-from .components.elementary import Nodes, Grid, MapParticles, NodeType
+from .components.elementary import Grid, MapParticles, NodeType
 
 
 def _safe_evaluation(func):
@@ -70,7 +70,6 @@ class MapParser(object):
         grid = Grid(size=grid_size)
 
         # parse the other rows
-        all_nodes = Nodes()
         data_rows = list(map(lambda x: x.strip().split(utils.MAP_FILE_DATA_DELIMITER.value), data_rows))
         for data_row in data_rows[1:-1]:
             # get the data
@@ -82,6 +81,8 @@ class MapParser(object):
             pos_1, pos_2, type_1, type_2 = parsed_data_row
             big_node_1 = grid.create_big_node(*pos_1, type_=NodeType(type_1))
             big_node_2 = grid.create_big_node(*pos_2, type_=NodeType(type_2))
+
+            # create new big connection
             direction = MapParticles.BigNode.get_direction(particle1=big_node_1, particle2=big_node_2)
             MapParticles.BigNode.big_connect(big_node_1=big_node_1, big_node_2=big_node_2, direction_1_2=direction)  # big neighbours
 
@@ -90,10 +91,9 @@ class MapParser(object):
 
             # set-up little neighbours
             nodes = [big_node_1] + list(sub_nodes) + [big_node_2]
-            Nodes.neighbourhood(*nodes, direction=direction)
-            all_nodes.add_nodes(*nodes)     # this will not add duplicates! first of each will be considered as original node
+            grid.nodes.neighbourhood(*nodes, direction=direction)
 
         # collect grid slots that remained as WALLS
         walls = grid.get_all_walls()
 
-        return all_nodes, walls
+        return grid.nodes, walls
