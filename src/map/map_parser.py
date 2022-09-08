@@ -69,31 +69,42 @@ class MapParser(object):
             return -1
         grid = Grid(size=grid_size)
 
-        # parse the other rows
-        data_rows = list(map(lambda x: x.strip().split(utils.MAP_FILE_DATA_DELIMITER.value), data_rows))
-        for data_row in data_rows[1:-1]:
-            # get the data
-            parsed_data_row = MapParser._parse_row(data_row=data_row)
+        # parse and evaluate other rows
+        data_rows = map(
+            lambda x: MapParser._parse_row(
+                data_row=x.strip().split(
+                    utils.MAP_FILE_DATA_DELIMITER.value
+                )),
+            data_rows[1:-1]
+        )
+        for parsed_data_row in data_rows:
             if parsed_data_row == -1:
                 return -1
 
-            # unpack valid data values and create BigNodes
-            pos_1, pos_2, type_1, type_2 = parsed_data_row
-            big_node_1 = grid.create_big_node(*pos_1, type_=NodeType(type_1))
-            big_node_2 = grid.create_big_node(*pos_2, type_=NodeType(type_2))
+            # unpack valid data values
+            pos_1_real, pos_2_real, type_1, type_2 = parsed_data_row
 
-            # create new big connection
-            direction = MapParticles.BigNode.get_direction(particle1=big_node_1, particle2=big_node_2)
-            MapParticles.BigNode.big_connect(big_node_1=big_node_1, big_node_2=big_node_2, direction_1_2=direction)  # big neighbours
+            # calculate the vertically symmetrical positions
+            pos_1_symm = (grid.cols - pos_1_real[0], pos_1_real[1])
+            pos_2_symm = (grid.cols - pos_2_real[0], pos_2_real[1])
 
-            # create all sub-nodes between two big nodes, with appropriate type
-            sub_nodes = grid.create_sub_nodes(from_node=big_node_1, to_node=big_node_2, direction=direction)  # generator
+            # and create BigNodes
+            for pos_1, pos_2 in [(pos_1_real, pos_2_real), (pos_1_symm, pos_2_symm)]:
+                big_node_1 = grid.create_big_node(*pos_1, type_=NodeType(type_1))
+                big_node_2 = grid.create_big_node(*pos_2, type_=NodeType(type_2))
 
-            # set-up little neighbours
-            nodes = [big_node_1] + list(sub_nodes) + [big_node_2]
-            grid.nodes.neighbourhood(*nodes, direction=direction)
+                # create new big connection
+                direction = MapParticles.BigNode.get_direction(particle1=big_node_1, particle2=big_node_2)
+                MapParticles.BigNode.big_connect(big_node_1=big_node_1, big_node_2=big_node_2, direction_1_2=direction)  # big neighbours
+
+                # create all sub-nodes between two big nodes, with appropriate type
+                sub_nodes = grid.create_sub_nodes(from_node=big_node_1, to_node=big_node_2, direction=direction)  # generator
+
+                # set-up little neighbours
+                nodes = [big_node_1] + list(sub_nodes) + [big_node_2]
+                grid.nodes.neighbourhood(*nodes, direction=direction)
 
         # collect grid slots that remained as WALLS
         walls = grid.get_all_walls()
 
-        return grid.nodes, walls
+        return grid.size, grid.nodes, walls
