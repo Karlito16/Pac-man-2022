@@ -88,8 +88,8 @@ class MapParser(object):
             pos_1_symm = (grid.cols - pos_1_real[0], pos_1_real[1])
             pos_2_symm = (grid.cols - pos_2_real[0], pos_2_real[1])
 
-            # and create BigNodes
             for pos_1, pos_2 in [(pos_1_real, pos_2_real), (pos_1_symm, pos_2_symm)]:
+                # create BigNodes
                 big_node_1 = grid.create_big_node(*pos_1, type_=NodeType(type_1))
                 big_node_2 = grid.create_big_node(*pos_2, type_=NodeType(type_2))
 
