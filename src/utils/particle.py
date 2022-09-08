@@ -48,7 +48,7 @@ class Particle(object):
         return None
 
     def __del__(self):
-        """Destructor."""
+        """Destructor method."""
         del self._i
         del self._j
         del self._type
