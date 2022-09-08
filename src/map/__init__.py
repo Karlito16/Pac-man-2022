@@ -9,7 +9,7 @@ from .map_parser import MapParser
 
 __all__ = (
     "elementary",
-    "food",
+    "foods",
     "enemy_box",
     "gate",
     "walls",

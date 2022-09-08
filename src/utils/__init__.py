@@ -9,3 +9,4 @@ from .neighbours import Neighbours
 from .particle import Particle
 from .particle_container import ParticleContainer
 from .particle_type import ParticleType
+from .window import *
