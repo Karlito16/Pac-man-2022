@@ -47,6 +47,13 @@ class Particle(object):
             return math.sqrt(math.pow(self.i - other.i, 2) + math.pow(self.j - other.j, 2))
         return None
 
+    def __del__(self):
+        """Destructor."""
+        del self._i
+        del self._j
+        del self._type
+        del self._neighbours
+
     @property
     def i(self):
         """Getter."""
