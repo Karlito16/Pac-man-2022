@@ -95,7 +95,7 @@ class MapParser(object):
 
                 # create new big connection
                 direction = MapParticles.BigNode.get_direction(particle1=big_node_1, particle2=big_node_2)
-                MapParticles.BigNode.big_connect(big_node_1=big_node_1, big_node_2=big_node_2, direction_1_2=direction)  # big neighbours
+                MapParticles.BigNode.big_connect(big_node_1=big_node_1, big_node_2=big_node_2, direction=direction)  # big neighbours
 
                 # create all sub-nodes between two big nodes, with appropriate type
                 sub_nodes = grid.create_sub_nodes(from_node=big_node_1, to_node=big_node_2, direction=direction)  # generator
@@ -107,4 +107,4 @@ class MapParser(object):
         # collect grid slots that remained as WALLS
         walls = grid.get_all_walls()
 
-        return grid.size, grid.nodes, walls
+        return grid.full_size, grid.nodes, walls

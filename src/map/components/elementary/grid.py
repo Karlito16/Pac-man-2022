@@ -8,7 +8,7 @@ from .grid_slot_type import GridSlotType
 from .map_particles import MapParticles
 from .node_type import NodeType
 from .nodes import Nodes
-from src.utils import Directions, ParticleContainer, DIRECTIONS_COORDINATES_DIFFERENCE
+import src.utils as utils
 
 
 class Grid(dict):
@@ -22,6 +22,7 @@ class Grid(dict):
         """
         self._size = size
         self._cols, self._rows = self._size
+        *self._size_pixels, self._grid_slot_size = utils.calculate_grid_dimensions(grid_size=self._size)
         super().__init__()
         self._enable_editing = True
         self._init_grid()
@@ -52,6 +53,11 @@ class Grid(dict):
         return self._cols
 
     @property
+    def full_size(self):
+        """Getter."""
+        return tuple(self._size_pixels)
+
+    @property
     def nodes(self):
         """Getter."""
         return self._nodes
@@ -59,9 +65,9 @@ class Grid(dict):
     def _init_grid(self):
         """Creates the grid with the grid slots."""
         for row in range(self.rows):
-            row_container = ParticleContainer(particle_instance=MapParticles.GridSlot)
+            row_container = utils.ParticleContainer(particle_instance=MapParticles.GridSlot)
             for col in range(self.cols):
-                row_container.add(MapParticles.GridSlot(i=col, j=row, type_=GridSlotType.WALL))
+                row_container.add(MapParticles.GridSlot(i=col, j=row, size=self._grid_slot_size, type_=GridSlotType.WALL))
             self[row] = row_container
         return
 
@@ -69,7 +75,7 @@ class Grid(dict):
         """Sets the grids slot's neighbours."""
         for grid_slot in self.get_all():
             # try all 4 directions
-            for direction, (i, j) in DIRECTIONS_COORDINATES_DIFFERENCE.value.items():
+            for direction, (i, j) in utils.DIRECTIONS_COORDINATES_DIFFERENCE.value.items():
                 grid_slot.add_neighbour(
                     neighbour=self.get_grid_slot(i=grid_slot.i + i, j=grid_slot.j + j),
                     direction=direction
@@ -102,7 +108,7 @@ class Grid(dict):
         """Wrapper method for creating a node/big node."""
         node = self._nodes.get_node(i=i, j=j)
         if not node:
-            node = class_(i=i, j=j, type_=type_)
+            node = class_(i=i, j=j, size=utils.MAP_GRID_SLOT_NODE_SIZE_RELATION.value * self._grid_slot_size, type_=type_)
             self.define_grid_slots_for_node(node=node)
             self._nodes.add_node(node=node)
         return node
@@ -140,11 +146,11 @@ class Grid(dict):
             particle1=from_node,
             particle2=to_node
         )
-        if direction != Directions.UNDEFINED and \
+        if direction != utils.Directions.UNDEFINED and \
                 isinstance(from_node, MapParticles.BigNode) and \
                 isinstance(to_node, MapParticles.BigNode):
 
-            diff_i, diff_j = DIRECTIONS_COORDINATES_DIFFERENCE.value[direction]
+            diff_i, diff_j = utils.DIRECTIONS_COORDINATES_DIFFERENCE.value[direction]
             start_i, start_j = from_node.pos
             n = int(from_node - to_node) - 1  # number of sub nodes which will be created
             sub_nodes_type = Grid._get_sub_nodes_type(from_node_type=from_node.type, to_node_type=to_node.type)

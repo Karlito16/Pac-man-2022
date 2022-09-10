@@ -13,17 +13,16 @@ class Walls(pygame.sprite.Group):
     class Wall(pygame.sprite.Sprite):
         """Wall class."""
 
-        def __init__(self, grid_slot, grid_slot_size, wall_size, wall_color, wall_radius):
+        def __init__(self, grid_slot, wall_size, wall_color, wall_radius):
             """
             Constructor.
             """
             self._grid_slot = grid_slot
-            self._grid_slot_size = grid_slot_size
             self._wall_size = wall_size
             self._wall_color = wall_color
             self._wall_radius = wall_radius
             super().__init__()
-            self.image = pygame.Surface((self._grid_slot_size, self._grid_slot_size))
+            self.image = pygame.Surface((self._grid_slot.size, self._grid_slot.size))
             self.rect = pygame.draw.rect(
                 surface=self.image,
                 color=self._wall_color,
@@ -32,8 +31,8 @@ class Walls(pygame.sprite.Group):
                 border_radius=self._wall_radius
             )
             self.rect.topleft = (
-                self._grid_slot_size * self._grid_slot.i,
-                self._grid_slot_size * self._grid_slot.j
+                self._grid_slot.size * self._grid_slot.i,
+                self._grid_slot.size * self._grid_slot.j
             )
 
         @property
@@ -60,7 +59,7 @@ class Walls(pygame.sprite.Group):
             """Overrides the method in sprite class."""
             pass
 
-    def __init__(self, grid_slots_wall, grid_slot_size):
+    def __init__(self, grid_slots_wall):
         """
         Constructor.
         """
@@ -69,7 +68,6 @@ class Walls(pygame.sprite.Group):
         for grid_slot in self._grid_slots_wall:
             self.add(Walls.Wall(
                 grid_slot=grid_slot,
-                grid_slot_size=grid_slot_size,
                 wall_size=utils.MAP_WALL_SIZE.value,
                 wall_color=utils.MAP_WALL_COLOR.value,
                 wall_radius=utils.MAP_WALL_RADIUS.value

@@ -70,10 +70,10 @@ class Nodes(dict):
         return itertools.chain(*self.values())
 
     @new_nodes
-    def get_all_by_type(self, type_):
-        """Returns all the nodes with given type."""
+    def get_all_by_type(self, *args):
+        """Returns all the nodes with given type or mutliple types."""
         for node in self.get_all():
-            if node.type == type_:
+            if node.type in args:
                 yield node
 
     @new_nodes
@@ -97,6 +97,6 @@ class Nodes(dict):
             MapParticles.Node.connect(
                 particle_1=args[node_index],
                 particle_2=args[node_index + 1],
-                direction_1_2=direction
+                direction=direction
             )
         return True

@@ -12,11 +12,11 @@ class MapParticles:
     class Node(Particle):
         """Node class."""
 
-        def __init__(self, i, j, type_):
+        def __init__(self, i, j, size, type_):
             """
             Cnstructor.
             """
-            super().__init__(i=i, j=j, type_=type_)
+            super().__init__(i=i, j=j, size=size, type_=type_)
             self._grid_slots = ParticleContainer(particle_instance=MapParticles.GridSlot)
 
         @property
@@ -42,11 +42,11 @@ class MapParticles:
     class GridSlot(Particle):
         """Grid slot class."""
 
-        def __init__(self, i, j, type_):
+        def __init__(self, i, j, size, type_):
             """
             Constructor.
             """
-            super().__init__(i=i, j=j, type_=type_)
+            super().__init__(i=i, j=j, size=size, type_=type_)
             self._nodes = ParticleContainer(particle_instance=MapParticles.Node)
 
         @property
@@ -57,14 +57,14 @@ class MapParticles:
     class BigNode(Node):
         """BigNode class."""
 
-        def __init__(self, i, j, type_):
+        def __init__(self, i, j, size, type_):
             """
             Constructor.
             :param i:
             :param j:
             :param type_:
             """
-            super().__init__(i=i, j=j, type_=type_)
+            super().__init__(i=i, j=j, size=size, type_=type_)
             self._big_neighbours = Neighbours()
 
         @property
@@ -79,14 +79,14 @@ class MapParticles:
             return False
 
         @classmethod
-        def big_connect(cls, big_node_1, big_node_2, direction_1_2=None):
+        def big_connect(cls, big_node_1, big_node_2, direction=None):   # TODO: implement this method with already existing connect method
             """Connects the two big nodes."""
-            direction_1_2 = direction_1_2 if direction_1_2 is not None else Particle.get_direction(
+            direction = direction if direction is not None else Particle.get_direction(
                     particle1=big_node_1,
                     particle2=big_node_2
                 )
             if isinstance(big_node_1, cls) and isinstance(big_node_2, cls):
-                big_node_1.add_big_neighbour(direction=direction_1_2, neighbour=big_node_2)
-                big_node_2.add_big_neighbour(direction=Directions.get_opposite(direction=direction_1_2), neighbour=big_node_1)
+                big_node_1.add_big_neighbour(direction=direction, neighbour=big_node_2)
+                big_node_2.add_big_neighbour(direction=Directions.get_opposite(direction=direction), neighbour=big_node_1)
                 return True
             return False

@@ -10,7 +10,7 @@ from .directions import Directions
 class Particle(object):
     """Particle class."""
 
-    def __init__(self, i, j, type_):
+    def __init__(self, i, j, size, type_):
         """
         Constructor.
         :param i:
@@ -19,6 +19,7 @@ class Particle(object):
         """
         self._i = i
         self._j = j
+        self._size = size
         self._type = type_
         self._neighbours = Neighbours()
 
@@ -70,6 +71,11 @@ class Particle(object):
         return self.i, self.j
 
     @property
+    def size(self):
+        """Getter."""
+        return self._size
+
+    @property
     def type(self):
         """Getter."""
         return self._type
@@ -105,15 +111,15 @@ class Particle(object):
         return Directions.UNDEFINED
 
     @classmethod
-    def connect(cls, particle_1, particle_2, direction_1_2=None):
+    def connect(cls, particle_1, particle_2, direction=None):
         """Connects the two particles."""
-        direction_1_2 = direction_1_2 if direction_1_2 is not None else Particle.get_direction(
+        direction = direction if direction is not None else Particle.get_direction(
             particle1=particle_1,
             particle2=particle_2
         )
         if isinstance(particle_1, cls) and isinstance(particle_2, cls) and \
                 (isinstance(particle_1, particle_2.__class__) or isinstance(particle_2, particle_1.__class__)):
-            particle_1.add_neighbour(direction=direction_1_2, neighbour=particle_2)
-            particle_2.add_neighbour(direction=Directions.get_opposite(direction=direction_1_2), neighbour=particle_1)
+            particle_1.add_neighbour(direction=direction, neighbour=particle_2)
+            particle_2.add_neighbour(direction=Directions.get_opposite(direction=direction), neighbour=particle_1)
             return True
         return False

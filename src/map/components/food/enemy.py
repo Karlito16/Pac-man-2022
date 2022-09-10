@@ -3,18 +3,25 @@
 # author: Karlo Dimjašević
 
 
-from .food import Food, FoodType
+from .food_ import Food
+from .food_type import FoodType
 
 
 class Enemy(Food):
     """Cherry class."""
 
-    def __init__(self):
+    def __init__(self, node):
         """
         Constructor
         """
-        super().__init__(food_type=FoodType.ENEMY)
+        super().__init__(node=node)
 
+    @property
+    def type(self):
+        """Getter."""
+        return FoodType.ENEMY
+
+    @property
     def value(self):
         """Returns the value (that is, score) when it's collected."""
-        pass
+        return self.type.value
