@@ -8,7 +8,6 @@ import src.utils as utils
 import src.map.components as components
 
 import pygame
-from typing import Any
 
 
 class Map(pygame.Surface):
@@ -61,12 +60,13 @@ class Map(pygame.Surface):
         """Getter."""
         return self._food
 
-    def update(self, *args: Any, **kwargs: Any) -> None:
-        """Overrides the method in sprite class."""
+    def update(self):
+        """Updates the map."""
         self.food.update()
 
     def draw(self, surface):
         """Draws the map."""
+        self.fill(utils.MAP_BACKGROUND_COLOR.value)
         self.walls.draw(surface=self)
         self.food.draw(surface=self)
 

@@ -3,7 +3,7 @@
 # author: Karlo Dimjašević
 
 
-from src.utils import Directions, Particle, ParticleContainer, Neighbours
+from src.utils import Directions, Particle, ParticleContainer, Neighbours, MAP_GRID_SLOT_NODE_SIZE_RELATION
 
 
 class MapParticles:
@@ -18,11 +18,27 @@ class MapParticles:
             """
             super().__init__(i=i, j=j, size=size, type_=type_)
             self._grid_slots = ParticleContainer(particle_instance=MapParticles.GridSlot)
+            self._grid_slot_size = self.size / MAP_GRID_SLOT_NODE_SIZE_RELATION.value
 
         @property
         def grid_slots(self):
             """Getter."""
             return self._grid_slots
+
+        @property
+        def x(self):
+            """Gets horizontal position in pixels."""
+            return self.i * self._grid_slot_size
+
+        @property
+        def y(self):
+            """Gets vertical position in pixels."""
+            return self.j * self._grid_slot_size
+
+        @property
+        def pos_xy(self):
+            """Returns position in pixels."""
+            return self.x, self.y
 
         def check_for_possible_neighbours(self):
             """Node itself checks for all of the four possible neighbours."""

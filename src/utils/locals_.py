@@ -48,6 +48,7 @@ MAP_WALL_COLOR = PacmanConstant("#010759")
 MAP_WALL_RADIUS = PacmanConstant(1)
 MAP_MARGIN_TOP_PERCENTAGE = PacmanConstant(0.2)     # 20% of the total win height
 MAP_MARGIN_BOTTOM_PERCENTAGE = PacmanConstant(0.1)     # 10% of the total win height
+MAP_BACKGROUND_COLOR = PacmanConstant("Black")
 
 # DIRECTIONS
 DIRECTIONS_COORDINATES_DIFFERENCE = PacmanConstant({
@@ -65,5 +66,8 @@ FOOD_FLASH_ANIMATION_RANDOM_START_RANGE = PacmanConstant([0, 1000])   # miliseco
 FOOD_FLASH_ANIMATION_INTERVAL = PacmanConstant(100)    # miliseconds
 FOOD_FLASH_ANIMATION_SPEED = PacmanConstant(0.2)
 FOOD_PERCENTAGE_OF_FLASHING_OBJECTS_AT_ONCE = PacmanConstant(0.50)   # 50% randomly selected food object will do flash at one animation cycle
+FOOD_COLLECTING_ANIMATION_MAX_SIZE_PERCENTAGE = PacmanConstant(1.2)
+FOOD_COLLECTING_ANIMATION_SPEED = PacmanConstant(0.075)
+FOOD_TRAVELLING_ANIMATION_SPEED = PacmanConstant(0.4)
 FOOD_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.15)     # relative from node size
 FOOD_SUPER_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.25)      # relative from node size

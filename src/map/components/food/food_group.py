@@ -28,7 +28,7 @@ class FoodGroup(pygame.sprite.Group):
 
         self._flashing_event = utils.CustomEvents.new(
             interval=utils.FOOD_FLASH_ANIMATION_INTERVAL.value,
-            callback_function=self.animate
+            callback_function=self.flash_animation
         )
 
     def _get_non_active_sprites(self):
@@ -37,7 +37,7 @@ class FoodGroup(pygame.sprite.Group):
             if not sprite.is_flashing() and sprite.status != FoodStatus.COLLECTED:
                 yield sprite
 
-    def animate(self):
+    def flash_animation(self):
         """Method initiate flash animation for randomly selected food objects."""
         non_active_sprites = list(self._get_non_active_sprites())
         amount_of_needed_sprites = len(non_active_sprites) * utils.FOOD_PERCENTAGE_OF_FLASHING_OBJECTS_AT_ONCE.value

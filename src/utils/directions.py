@@ -10,10 +10,10 @@ from enum import Enum, unique
 class Directions(Enum):
     """All possible directions."""
 
-    TOP = -1
-    RIGHT = -2
-    BOTTOM = 1
-    LEFT = 2
+    TOP = 2
+    RIGHT = 1
+    BOTTOM = -2
+    LEFT = -1
     UNDEFINED = 0
 
     @staticmethod

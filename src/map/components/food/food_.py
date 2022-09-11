@@ -34,14 +34,20 @@ class Food(pygame.sprite.Sprite, ABC):
         if len(self._animation_images) < utils.MINIMAL_REQUIRED_ANIMATION_IMAGES.value:
             raise ValueError(f"minimal required amount of animations is: {utils.MINIMAL_REQUIRED_ANIMATION_IMAGES.value}")
 
-        self.image = self._animation_images[0]
-        self.rect = self.image.get_rect()
-        self.rect.center = self._center()
+        self._current_image_index = 0
+        self.image = self._animation_images[self._current_image_index]
+        self.rect = self.image.get_rect(center=self._center())
         self._status = FoodStatus.UNCOLLECTED
+
         self._flashing_animation_counter = utils.AnimationCounter(
             count_from=0,
             count_to=len(self._animation_images),
             step=utils.FOOD_FLASH_ANIMATION_SPEED.value
+        )
+        self._collecting_animation_counter = utils.AnimationCounter(
+            count_from=0,
+            count_to=utils.FOOD_COLLECTING_ANIMATION_MAX_SIZE_PERCENTAGE.value,
+            step=utils.FOOD_COLLECTING_ANIMATION_SPEED.value
         )
 
     @property
@@ -67,6 +73,20 @@ class Food(pygame.sprite.Sprite, ABC):
         """Setter."""
         self._flashing_animation_counter.start()
 
+    def is_collecting(self):
+        """Getter."""
+        return self._collecting_animation_counter.counting
+
+    def is_collected(self):
+        """Getter."""
+        return self._status == FoodStatus.COLLECTED
+
+    def collect(self):
+        """Collects the food object."""
+        if self._status == FoodStatus.UNCOLLECTED:
+            self._status = FoodStatus.COLLECTING
+            self._collecting_animation_counter.start()
+
     @property
     @abstractmethod
     def type(self):
@@ -89,15 +109,25 @@ class Food(pygame.sprite.Sprite, ABC):
         pass
 
     def _center(self):
-        """Method calculates the position for food object."""
-        node_size = self._node.size
-        grid_slot_size = node_size / utils.MAP_GRID_SLOT_NODE_SIZE_RELATION.value
-        x = grid_slot_size * self.node.i
-        y = grid_slot_size * self.node.j
-        return x, y
+        """Syntactic sugar method."""
+        return self.node.pos_xy
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Method updates food object."""
         # flashing animation
         if self.is_flashing():
-            self.image = self._animation_images[self._flashing_animation_counter.next_int()]
+            self._current_image_index = self._flashing_animation_counter.next_int()
+
+        # collecting animation
+        if self.is_collecting():
+            self._animation_images = list(utils.scale_images(
+                *self._animation_images,
+                relevant_size=self.relevant_size * (1 + self._collecting_animation_counter.next())
+            ))
+
+            if not self.is_collecting():
+                self._status = FoodStatus.COLLECTED
+
+        self.image = self._animation_images[self._current_image_index]
+        # next line is important because we might scale image during collecting animation, so we need to keep img in center
+        self.rect = self.image.get_rect(center=self._center())

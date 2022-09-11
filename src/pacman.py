@@ -7,8 +7,8 @@
 
 import pygame
 import game
-import utils
-import map
+import src.utils as utils
+import src.map as map_
 
 
 class Pacman(game.Game):
@@ -17,7 +17,7 @@ class Pacman(game.Game):
     def __init__(self, screen, clock):
         """Constructor. Initiliazes the game parameters."""
         super().__init__(screen, clock)
-        self._maps = map.load_maps()
+        self._maps = map_.load_maps()
 
     def mainloop(self):
         """Main game loop"""

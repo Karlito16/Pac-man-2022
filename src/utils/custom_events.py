@@ -14,7 +14,7 @@ class CustomEvents(object):
 
     class Event(object):
 
-        def __init__(self, interval, callback_function):
+        def __init__(self, interval: int, callback_function: callable):
             """Constructor."""
             self._interval = interval   # miliseconds
             self._callback_function = callback_function

@@ -3,6 +3,7 @@
 # author: Karlo Dimjašević
 
 
+from .counters import *
 from .animation_counter import AnimationCounter
 from .directions import Directions
 from .custom_events import CustomEvents
