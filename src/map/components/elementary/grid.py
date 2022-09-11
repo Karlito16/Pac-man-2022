@@ -58,6 +58,11 @@ class Grid(dict):
         return tuple(self._size_pixels)
 
     @property
+    def grid_slot_size(self):
+        """Getter."""
+        return self._grid_slot_size
+
+    @property
     def nodes(self):
         """Getter."""
         return self._nodes

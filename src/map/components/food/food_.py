@@ -35,19 +35,33 @@ class Food(pygame.sprite.Sprite, ABC):
             raise ValueError(f"minimal required amount of animations is: {utils.MINIMAL_REQUIRED_ANIMATION_IMAGES.value}")
 
         self._current_image_index = 0
+        self._alpha_value = 255
         self.image = self._animation_images[self._current_image_index]
         self.rect = self.image.get_rect(center=self._center())
         self._status = FoodStatus.UNCOLLECTED
 
-        self._flashing_animation_counter = utils.AnimationCounter(
+        self._flashing_animation = utils.CycleCounter(
             count_from=0,
             count_to=len(self._animation_images),
-            step=utils.FOOD_FLASH_ANIMATION_SPEED.value
+            count_speed=utils.FOOD_FLASH_ANIMATION_SPEED.value,
+            step_function=self._set_current_image_index,
+            resolve_function=lambda: self._set_current_image_index(0),
+            count_int=True
         )
-        self._collecting_animation_counter = utils.AnimationCounter(
+        self._collect_animation = utils.CycleCounter(
             count_from=0,
             count_to=utils.FOOD_COLLECTING_ANIMATION_MAX_SIZE_PERCENTAGE.value,
-            step=utils.FOOD_COLLECTING_ANIMATION_SPEED.value
+            count_speed=utils.FOOD_COLLECTING_ANIMATION_SPEED.value,
+            step_function=self._scale_images,
+            resolve_function=lambda: self._scale_images(scale_factor=0)
+        )
+        self._fade_animation = utils.ConditionalCounter(
+            condition_function=self._is_faded,
+            count_from=255,
+            count_speed=-utils.FOOD_FADE_ANIMATION_SPEED.value,
+            step_function=self._set_alpha,
+            resolve_function=lambda: self._set_alpha(alpha_value=0),
+            count_int=True
         )
 
     @property
@@ -60,6 +74,33 @@ class Food(pygame.sprite.Sprite, ABC):
         """Getter."""
         return self._status
 
+    def _set_current_image_index(self, index: int) -> None:
+        """Callback function."""
+        self._current_image_index = index
+        return None
+
+    def _scale_images(self, scale_factor: float) -> None:
+        """Callback function."""
+        self._animation_images = list(
+            utils.scale_images(
+                *self._animation_images,
+                relevant_size=self.relevant_size * (1 + scale_factor)
+            )
+        )
+        return None
+
+    def _set_alpha(self, alpha_value: int) -> None:
+        """Callback function."""
+        self._alpha_value = alpha_value
+        return None
+
+    def _is_faded(self):
+        """Callback function."""
+        current_alpha = self.image.get_alpha()
+        if current_alpha > 0:
+            return False
+        return True
+
     @status.setter
     def status(self, other: FoodStatus):
         """Setter."""
@@ -67,15 +108,16 @@ class Food(pygame.sprite.Sprite, ABC):
 
     def is_flashing(self):
         """Getter."""
-        return self._flashing_animation_counter.counting
+        return self._flashing_animation.counting
 
     def set_flashing(self):
         """Setter."""
-        self._flashing_animation_counter.start()
+        if not self.is_flashing():
+            self._flashing_animation.start()
 
     def is_collecting(self):
         """Getter."""
-        return self._collecting_animation_counter.counting
+        return self._collect_animation.counting
 
     def is_collected(self):
         """Getter."""
@@ -85,7 +127,8 @@ class Food(pygame.sprite.Sprite, ABC):
         """Collects the food object."""
         if self._status == FoodStatus.UNCOLLECTED:
             self._status = FoodStatus.COLLECTING
-            self._collecting_animation_counter.start()
+            self._collect_animation.start()
+            self._fade_animation.start()
 
     @property
     @abstractmethod
@@ -114,20 +157,12 @@ class Food(pygame.sprite.Sprite, ABC):
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Method updates food object."""
-        # flashing animation
-        if self.is_flashing():
-            self._current_image_index = self._flashing_animation_counter.next_int()
-
-        # collecting animation
-        if self.is_collecting():
-            self._animation_images = list(utils.scale_images(
-                *self._animation_images,
-                relevant_size=self.relevant_size * (1 + self._collecting_animation_counter.next())
-            ))
-
-            if not self.is_collecting():
-                self._status = FoodStatus.COLLECTED
+        # animations
+        self._flashing_animation.next()
+        self._collect_animation.next()
+        self._fade_animation.next()
 
         self.image = self._animation_images[self._current_image_index]
-        # next line is important because we might scale image during collecting animation, so we need to keep img in center
+        self.image.set_alpha(self._alpha_value)
         self.rect = self.image.get_rect(center=self._center())
+

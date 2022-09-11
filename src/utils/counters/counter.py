@@ -7,8 +7,8 @@ class Counter(object):
     """Counter class."""
 
     def __init__(self, count_from: float, count_to: float, count_speed: float, step_function: callable,
-                 resolve_function: callable, count_int: bool = False, count_speed_power: float = 1.0,
-                 count_repeat: int = 1, round_on: int = 2):
+                 resolve_function: callable = None, count_int: bool = False, count_speed_power: float = 1.0,
+                 count_repeat: int = 1, round_on: int = 5):
         """
         Constructor.
         :param count_from:
@@ -24,7 +24,7 @@ class Counter(object):
         self._count_to = count_to
         self._count_speed = count_speed
         self._step_function = step_function
-        self._resolve_function = resolve_function
+        self._resolve_function = resolve_function if resolve_function is not None else lambda: self._counting
         self._count_int = count_int
         self._count_speed_power = count_speed_power
         self._count_repeat = count_repeat
@@ -37,8 +37,8 @@ class Counter(object):
         self._done = False
         self._paused = False
 
-        self._pow_n_func = lambda x: x ** self._count_speed_power
-        self._root_n_func = lambda x: x ** (1 / self._count_speed_power)
+        self._pow_n_func = lambda x: round(x * self._count_speed_power, self._round_on)
+        self._root_n_func = lambda x: round(x / self._count_speed_power, self._round_on)
 
     @property
     def counting(self) -> bool:
