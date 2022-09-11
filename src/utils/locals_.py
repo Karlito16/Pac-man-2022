@@ -71,3 +71,7 @@ FOOD_COLLECTING_ANIMATION_SPEED = PacmanConstant(0.075)
 FOOD_FADE_ANIMATION_SPEED = PacmanConstant(6)
 FOOD_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.15)     # relative from node size
 FOOD_SUPER_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.25)      # relative from node size
+
+# OTHER
+COLORS_ALPHA_MIN = PacmanConstant(255)
+COLORS_ALPHA_MAX = PacmanConstant(0)

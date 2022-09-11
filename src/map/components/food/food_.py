@@ -57,10 +57,10 @@ class Food(pygame.sprite.Sprite, ABC):
         )
         self._fade_animation = utils.ConditionalCounter(
             condition_function=self._is_faded,
-            count_from=255,
+            count_from=utils.COLORS_ALPHA_MIN.value,
             count_speed=-utils.FOOD_FADE_ANIMATION_SPEED.value,
             step_function=self._set_alpha,
-            resolve_function=lambda: self._set_alpha(alpha_value=0),
+            resolve_function=lambda: self._set_alpha(alpha_value=utils.COLORS_ALPHA_MAX.value),
             count_int=True
         )
 
@@ -165,4 +165,3 @@ class Food(pygame.sprite.Sprite, ABC):
         self.image = self._animation_images[self._current_image_index]
         self.image.set_alpha(self._alpha_value)
         self.rect = self.image.get_rect(center=self._center())
-
