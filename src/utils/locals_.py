@@ -33,6 +33,7 @@ FPS_RATE = PacmanConstant(60)   # frames per seconds
 PROJECT_DIR = PacmanConstant(os.getcwd())
 MAPS_DIR = PacmanConstant(f"{PROJECT_DIR.value}\\assets\\maps\\testing")
 FOOD_DIR = PacmanConstant(f"{PROJECT_DIR.value}\\assets\\food")
+CHARACHERS_DIR = PacmanConstant(f"{PROJECT_DIR.value}\\assets\\characters")
 
 # MAP PARAMETERS
 MAP_NAMES = PacmanConstant(os.listdir(MAPS_DIR.value))
@@ -56,7 +57,8 @@ DIRECTIONS_COORDINATES_DIFFERENCE = PacmanConstant({
     Directions.TOP: (0, -1),  # top
     Directions.RIGHT: (1, 0),  # right
     Directions.BOTTOM: (0, 1),  # bottom
-    Directions.LEFT: (-1, 0)  # left
+    Directions.LEFT: (-1, 0),  # left
+    Directions.UNDEFINED: (0, 0)
 })
 
 # ANIMATIONS PARAMETERS
@@ -73,6 +75,13 @@ FOOD_FADE_ANIMATION_SPEED = PacmanConstant(6)
 FOOD_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.15)     # relative from node size
 FOOD_SUPER_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.25)      # relative from node size
 FOOD_CHERRY_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.3)      # relative from node size
+
+# CHARACTERS
+CHARACTER_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.8)    # relative from node size
+CHARACTER_DEFAULT_DIRECTION = PacmanConstant(Directions.LEFT)
+CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME = PacmanConstant("_animation_images_")
+CHARACTER_MOVING_SPEED = PacmanConstant(3)
+CHARACTER_MOVING_ANIMATION_SPEED = PacmanConstant(0.1)
 
 # OTHER
 COLORS_ALPHA_MIN = PacmanConstant(255)

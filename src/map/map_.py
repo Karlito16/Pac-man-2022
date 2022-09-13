@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from src.map.components.elementary import MapParticles
 from src.map.components.elementary import Nodes
+from src.map.components.characters import Pacman
 import src.map.components as components
 from .map_parser import MapParser
 import src.utils as utils
@@ -39,6 +40,8 @@ class Map(pygame.Surface):
                 components.elementary.NodeType.SUPER
             )
         )
+        self._pacman = Pacman(starting_node=next(self._nodes.get_all_by_type(components.elementary.NodeType.PACMAN)))
+        self._pacman_group = pygame.sprite.GroupSingle(self._pacman)
 
     @property
     def name(self) -> str:
@@ -65,9 +68,25 @@ class Map(pygame.Surface):
         """Getter."""
         return self._food
 
+    @property
+    def pacman(self) -> Pacman:
+        """Getter."""
+        return self._pacman
+
+    @property
+    def pacman_group(self):
+        """Getter."""
+        return self._pacman_group
+
     def update(self) -> None:
         """Updates the map."""
+        # check collides
+        if pygame.sprite.spritecollideany(sprite=self.pacman, group=self.walls):
+            self.pacman.moving = False
+
+        # update
         self.food.update()
+        self.pacman_group.update()
         return None
 
     def draw(self, surface: pygame.Surface) -> None:
@@ -75,6 +94,7 @@ class Map(pygame.Surface):
         self.fill(utils.MAP_BACKGROUND_COLOR.value)
         self.walls.draw(surface=self)
         self.food.draw(surface=self)
+        self.pacman_group.draw(surface=self)
 
         surface.blit(self, self.rect)
         return None

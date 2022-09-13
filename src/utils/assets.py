@@ -5,7 +5,7 @@
 from __future__ import annotations
 import src.utils as utils
 
-from typing import Generator
+from typing import Any, Generator
 import os
 import pygame
 
@@ -34,7 +34,24 @@ def load_map_file(file_name: str, read_binary: bool = False, file_path: str = No
         return data
 
 
-def load_images(directory: str) -> Generator[pygame.Surface, ]:
+def load_images(directory: str, directory_constraints: list[str, ] = None, wshadow: bool = False) -> Generator[pygame.Surface, ]:
     """Returns loaded images in given directory."""
-    for img_file in os.listdir(directory):
-        yield pygame.image.load(f"{directory}\\{img_file}").convert_alpha()
+    directory_constraints = [""] if directory_constraints is None else directory_constraints
+    for constraint in directory_constraints:
+        constraint = constraint + "_wshadow" if wshadow else constraint
+        for img_file in (file_name for file_name in os.listdir(directory) if constraint in file_name):
+            yield pygame.image.load(f"{directory}\\{img_file}").convert_alpha()
+
+
+def import_assets(instance: Any, attr_name: str, directory: str, relevant_size: float = 1.0, directory_constraints: list[str, ] = None, wshadow: bool = False) -> None | ValueError:
+    """Imports the assets from given directory."""
+    # load the assets images
+    loaded_images = list(load_images(directory=directory, directory_constraints=directory_constraints, wshadow=wshadow))
+    # check asset number
+    if len(loaded_images) < utils.MINIMAL_REQUIRED_ANIMATION_IMAGES.value:
+        raise ValueError(f"minimal required amount of animation assets is: {utils.MINIMAL_REQUIRED_ANIMATION_IMAGES.value}\n{directory_constraints}")
+    # scale the images
+    scaled_images = utils.scale_images(*loaded_images, relevant_size=relevant_size)
+    # set attribute
+    setattr(instance, attr_name, list(scaled_images))
+    return None

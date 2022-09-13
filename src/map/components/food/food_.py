@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
 
+from __future__ import annotations
 
 from .food_status import FoodStatus
 from .food_type import FoodType
@@ -23,18 +24,12 @@ class Food(pygame.sprite.Sprite, ABC):
         self._node = node
         super().__init__()
 
-        self._animation_images = list(
-            utils.scale_images(
-                *list(
-                    utils.load_images(
-                        directory=f"{utils.FOOD_DIR.value}\\{self.type.name}"
-                    )
-                ),
-                relevant_size=self.relevant_size
-            )
+        utils.import_assets(
+            instance=self,
+            attr_name="_animation_images",
+            directory=f"{utils.FOOD_DIR.value}\\{self.type.name}",
+            relevant_size=self.relevant_size
         )
-        if len(self._animation_images) < utils.MINIMAL_REQUIRED_ANIMATION_IMAGES.value:
-            raise ValueError(f"minimal required amount of animations is: {utils.MINIMAL_REQUIRED_ANIMATION_IMAGES.value}")
 
         self._current_image_index = 0
         self._alpha_value = 255
@@ -81,15 +76,18 @@ class Food(pygame.sprite.Sprite, ABC):
         self._current_image_index = index
         return None
 
-    def _scale_images(self, scale_factor: float) -> None:
+    def _scale_images(self, scale_factor: float) -> None | AttributeError:
         """Callback function."""
-        self._animation_images = list(
-            utils.scale_images(
-                *self._animation_images,
-                relevant_size=self.relevant_size * (1 + scale_factor)
+        if hasattr(self, "_animation_images"):
+            self._animation_images = list(
+                utils.scale_images(
+                    *self._animation_images,
+                    relevant_size=self.relevant_size * (1 + scale_factor)
+                )
             )
-        )
-        return None
+            return None
+        else:
+            raise AttributeError(f"No attribute named: '_animation_images'")
 
     def _set_alpha(self, alpha_value: int) -> None:
         """Callback function."""

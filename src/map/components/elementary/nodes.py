@@ -32,6 +32,20 @@ class Nodes(dict):
         """
         super().__init__()
 
+    def __iter__(self):
+        self._index = 0
+        self._iter_values = list(self.get_all())
+        return self
+
+    def __next__(self):
+        if not hasattr(self, "_index") or not hasattr(self, "_iter_values"):
+            self.__iter__()
+        if self._index >= len(self._iter_values):
+            raise StopIteration()
+        next_ = self._iter_values[self._index]
+        self._index += 1
+        return next_
+
     @staticmethod
     def is_node(node: MapParticles.Node) -> bool:
         """Checks if given parameter is a Nodes.Node class instance."""
