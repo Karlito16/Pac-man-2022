@@ -6,12 +6,11 @@
 
 
 import pygame
-import game
 import src.utils as utils
 import src.map as map_
 
 
-class Pacman(game.Game):
+class Pacman(utils.Game):
     """Main class."""
 
     def __init__(self, screen, clock):

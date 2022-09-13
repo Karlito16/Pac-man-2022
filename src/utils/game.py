@@ -5,17 +5,17 @@
 # created: 2022-09-04 23:52
 
 
-import abc
+from abc import ABC, abstractmethod
 import pygame
 import sys
 
 
-class Game(abc.ABC):
+class Game(ABC):
     """
     Abstract game class.
     """
 
-    def __init__(self, screen, clock):
+    def __init__(self, screen: pygame.Surface, clock: pygame.time.Clock):
         """
         Constructor.
         :param screen:
@@ -24,22 +24,22 @@ class Game(abc.ABC):
         self._clock = clock
 
     @property
-    def screen(self):
+    def screen(self) -> pygame.Surface:
         """Getter."""
         return self._screen
 
     @property
-    def clock(self):
+    def clock(self) -> pygame.time.Clock:
         """Returns the clock attribute."""
         return self._clock
 
-    @abc.abstractmethod
-    def mainloop(self):
+    @abstractmethod
+    def mainloop(self) -> None:
         """Main game loop. Must be implemented in the child class."""
         pass
 
     @staticmethod
-    def terminate():
+    def terminate() -> None:
         """Terminates the game."""
         pygame.quit()
         sys.exit()

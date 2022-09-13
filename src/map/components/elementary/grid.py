@@ -97,6 +97,12 @@ class Grid(dict):
         for grid_slot in itertools.chain(*self.values()):
             yield grid_slot
 
+    def get_all_walls(self) -> Generator[MapParticles.GridSlot]:
+        """Returns a list with all grid slotss that remained walls."""
+        for grid_slot in self.get_all():
+            if grid_slot.type == GridSlotType.WALL:
+                yield grid_slot
+
     def get_grid_slot(self, i: int, j: int) -> MapParticles.GridSlot | None:
         """Returns the grid slot at (i, j) position."""
         if i in range(0, self.cols) and j in range(0, self.rows):
@@ -173,9 +179,3 @@ class Grid(dict):
                 )
                 yield node
         return None
-
-    def get_all_walls(self) -> Generator[MapParticles.GridSlot]:
-        """Returns a list with all grid slotss that remained walls."""
-        for grid_slot in self.get_all():
-            if grid_slot.type == GridSlotType.WALL:
-                yield grid_slot
