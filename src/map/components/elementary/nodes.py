@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
-import itertools
+
+
+from __future__ import annotations
 
 from .map_particles import MapParticles
-from src.utils import ParticleContainer
+from .node_type import NodeType
+import src.utils as utils
+
+import itertools
+from typing import Callable, Generator
 
 
-def new_nodes(func):
+def new_nodes(func: Callable) -> Callable:
     """Decorator that wraps function's result into a new Nodes object."""
     def wrapper(*args, **kwargs):
         nodes = Nodes()
@@ -27,22 +33,24 @@ class Nodes(dict):
         super().__init__()
 
     @staticmethod
-    def is_node(node):
+    def is_node(node: MapParticles.Node) -> bool:
         """Checks if given parameter is a Nodes.Node class instance."""
         return isinstance(node, MapParticles.Node)
 
-    def add_node(self, node):
+    def add_node(self, node: MapParticles.Node) -> None:
         """Adds the node."""
         if node.j not in self.keys():
-            self[node.j] = ParticleContainer(particle_instance=MapParticles.Node)
+            self[node.j] = utils.ParticleContainer(particle_instance=MapParticles.Node)
         self[node.j].add(node)
+        return None
 
-    def add_nodes(self, node, *args):
+    def add_nodes(self, node: MapParticles.Node, *args: MapParticles.Node) -> None:
         """Adds multiple nodes in the node array."""
         for node_ in [node] + list(args):
             self.add_node(node=node_)
+        return None
 
-    def node_exists(self, node=None, i=None, j=None):
+    def node_exists(self, node: MapParticles.Node = None, i: int = None, j: int = None) -> bool:
         """
         Checks if given node already exists.
         Node can be defined either as Node object, or simply with two coordinates.
@@ -57,7 +65,7 @@ class Nodes(dict):
             return self[node.j].__contains__(particle=node)
         return False
 
-    def get_node(self, i, j):
+    def get_node(self, i: int, j: int) -> MapParticles.Node | None:
         """Returns the node with given i and j indexes."""
         if j in self.keys():
             for node in self[j]:
@@ -65,26 +73,26 @@ class Nodes(dict):
                     return node
         return None
 
-    def get_all(self):
+    def get_all(self) -> itertools.chain[MapParticles.Node, ]:
         """Returns all nodes."""
         return itertools.chain(*self.values())
 
     @new_nodes
-    def get_all_by_type(self, *args):
+    def get_all_by_type(self, *args: NodeType) -> Generator[MapParticles.Node, ]:
         """Returns all the nodes with given type or mutliple types."""
         for node in self.get_all():
             if node.type in args:
                 yield node
 
     @new_nodes
-    def get_big_nodes(self):
+    def get_big_nodes(self) -> Generator[MapParticles.BigNode, ]:
         """Returns only big nodes."""
         for node in self.get_all():
             if isinstance(node, MapParticles.BigNode):
                 yield node
 
     @staticmethod
-    def neighbourhood(*args, direction=None):
+    def neighbourhood(*args: MapParticles.Node, direction: utils.Directions = None) -> bool:
         """
         Creates the 'neighbourhood' between the given nodes.
         Two nodes that are next to the each other becomes a neighbours.

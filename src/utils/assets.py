@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
 
-
+from __future__ import annotations
 import src.utils as utils
-import pygame
+
+from typing import Generator
 import os
+import pygame
 
 
-def load_map_file(file_name, read_binary=False, file_path=None):
+def load_map_file(file_name: str, read_binary: bool = False, file_path: str = None) -> str | None:
     """
     Loads the file with given filename.
     Returns the file data.
@@ -32,7 +34,7 @@ def load_map_file(file_name, read_binary=False, file_path=None):
         return data
 
 
-def load_images(directory):
+def load_images(directory: str) -> Generator[pygame.Surface, ]:
     """Returns loaded images in given directory."""
     for img_file in os.listdir(directory):
         yield pygame.image.load(f"{directory}\\{img_file}").convert_alpha()

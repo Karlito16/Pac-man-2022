@@ -3,11 +3,16 @@
 # author: Karlo Dimjašević
 
 
+from __future__ import annotations
+
+from src.map.components.elementary import MapParticles
+from src.map.components.elementary import Nodes
+import src.map.components as components
 from .map_parser import MapParser
 import src.utils as utils
-import src.map.components as components
 
 import pygame
+from typing import Generator, Iterable
 
 
 class Map(pygame.Surface):
@@ -15,7 +20,7 @@ class Map(pygame.Surface):
     Map class.
     """
 
-    def __init__(self, name, size, nodes, grid_slots_wall):
+    def __init__(self, name: str, size: tuple[int, int], nodes: Nodes, grid_slots_wall: Iterable[MapParticles.GridSlot]):
         """
         Constructor.
         """
@@ -36,44 +41,46 @@ class Map(pygame.Surface):
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Getter."""
         return self._name
 
     @property
-    def size(self):
+    def size(self) -> tuple[int, int]:
         """Getter."""
         return self._size
 
     @property
-    def nodes(self):
+    def nodes(self) -> Nodes:
         """Getter."""
         return self._nodes
 
     @property
-    def walls(self):
+    def walls(self) -> components.Walls:
         """Getter."""
         return self._walls
 
     @property
-    def food(self):
+    def food(self) -> components.FoodGroup:
         """Getter."""
         return self._food
 
-    def update(self):
+    def update(self) -> None:
         """Updates the map."""
         self.food.update()
+        return None
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         """Draws the map."""
         self.fill(utils.MAP_BACKGROUND_COLOR.value)
         self.walls.draw(surface=self)
         self.food.draw(surface=self)
 
         surface.blit(self, self.rect)
+        return None
 
 
-def load_maps():
+def load_maps() -> Generator[Map, ]:
     """
     Function loads the game maps.
     :return: (<class 'Map'>)

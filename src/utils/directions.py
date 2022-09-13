@@ -3,6 +3,7 @@
 # author: Karlo Dimjašević
 
 
+from __future__ import annotations
 from enum import Enum, unique
 
 
@@ -17,7 +18,7 @@ class Directions(Enum):
     UNDEFINED = 0
 
     @staticmethod
-    def get_opposite(direction):
+    def get_opposite(direction: Directions) -> Directions:
         """Returns the opposite direction."""
         if isinstance(direction, Directions):
             return Directions(-1 * direction.value)

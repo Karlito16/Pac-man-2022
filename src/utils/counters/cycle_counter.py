@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
 
-
+from __future__ import annotations
 from .counter import Counter
+from typing import Any
 
 
 class CycleCounter(Counter):
@@ -13,7 +14,7 @@ class CycleCounter(Counter):
     _NEGATIVE = -1
     _INT_INTERVAL = 1
 
-    def __init__(self, *args, maintain_count_speed: bool = True, **kwargs):
+    def __init__(self, *args: Any, maintain_count_speed: bool = True, **kwargs: Any):
         """
         Constructor.
         """
@@ -30,14 +31,14 @@ class CycleCounter(Counter):
         return None
 
     @classmethod
-    def _max_sum(cls, speed) -> float:
+    def _max_sum(cls, speed: float) -> float:
         """Max sum of speeds which sum does not go over int interval (1)."""
         s = 0
         while s < CycleCounter._INT_INTERVAL:
             s += speed
         return s - speed
 
-    def _count_next(self) -> float or None:
+    def _count_next(self) -> float | None:
         """Override."""
         if self._done:
             return None

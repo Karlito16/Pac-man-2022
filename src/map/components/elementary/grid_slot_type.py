@@ -10,5 +10,5 @@ from enum import Enum, auto, unique
 class GridSlotType(Enum):
     """Grid slot types."""
 
-    WALL = auto()
     PATH = auto()
+    WALL = auto()

@@ -3,6 +3,7 @@
 # author: Karlo Dimjašević
 
 
+from typing import Callable, Iterable
 import pygame
 
 
@@ -14,7 +15,7 @@ class CustomEvents(object):
 
     class Event(object):
 
-        def __init__(self, interval: int, callback_function: callable):
+        def __init__(self, interval: int, callback_function: Callable):
             """Constructor."""
             self._interval = interval   # miliseconds
             self._callback_function = callback_function
@@ -24,31 +25,33 @@ class CustomEvents(object):
             CustomEvents._EVENTS[self._event] = self
             pygame.time.set_timer(self._event, self._interval)
 
-        def __del__(self):
+        def __del__(self) -> None:
             """Class destructor."""
-            del CustomEvents._EVENTS[self._event]
+            del CustomEvents._EVENTS[self._event_id]
             CustomEvents._NUM_OF_EVENTS -= 1
+            return None
 
-        def call(self):
+        def __call__(self) -> None:
             """Calls the callback function."""
             self._callback_function()
 
         @property
-        def event(self):
+        def event(self) -> int:
             """Getter."""
             return self._event
 
     @classmethod
-    def new(cls, interval: int, callback_function: callable):
+    def new(cls, interval: int, callback_function: Callable) -> Event:
         """Creates new Event object."""
         return cls.Event(interval=interval, callback_function=callback_function)
 
     @classmethod
-    def events(cls):
+    def events(cls) -> Iterable[int, ]:
         """Returns all the existing events."""
         return cls._EVENTS.keys()
 
     @classmethod
-    def process(cls, event: Event):
+    def process(cls, event: Event) -> None:
         """Processes the given event."""
-        cls._EVENTS[event].call()
+        cls._EVENTS[event]()
+        return None

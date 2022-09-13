@@ -2,21 +2,22 @@
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
 
-
+from __future__ import annotations
 from .counter import Counter
+from typing import Any, Callable
 
 
 class ConditionalCounter(Counter):
     """Counter class."""
 
-    def __init__(self, condition_function: callable, count_from: float, *args, **kwargs):
+    def __init__(self, condition_function: Callable, count_from: float, *args: Any, **kwargs: Any):
         """
         Constructor.
         """
         self._condition_function = condition_function
         super().__init__(count_from, 0, *args, **kwargs)
 
-    def _count_next(self) -> float or None:
+    def _count_next(self) -> float | None:
         """Override."""
         if self._done:
             return None

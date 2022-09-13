@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
-from typing import Any
 
-import pygame
+
+from src.map.components.elementary import MapParticles
 import src.utils as utils
+
+from typing import Any, Iterable
+import pygame
 
 
 class Walls(pygame.sprite.Group):
@@ -13,7 +16,7 @@ class Walls(pygame.sprite.Group):
     class Wall(pygame.sprite.Sprite):
         """Wall class."""
 
-        def __init__(self, grid_slot, wall_size, wall_color, wall_radius):
+        def __init__(self, grid_slot: MapParticles.GridSlot, wall_size: int, wall_color: str, wall_radius: int):
             """
             Constructor.
             """
@@ -36,22 +39,22 @@ class Walls(pygame.sprite.Group):
             )
 
         @property
-        def grid_slot(self):
+        def grid_slot(self) -> MapParticles.GridSlot:
             """Getter."""
             return self._grid_slot
 
         @property
-        def wall_size(self):
+        def wall_size(self) -> int:
             """Getter."""
             return self._wall_size
 
         @property
-        def wall_color(self):
+        def wall_color(self) -> str:
             """Getter."""
             return self._wall_color
 
         @property
-        def wall_radius(self):
+        def wall_radius(self) -> int:
             """Getter."""
             return self._wall_radius
 
@@ -59,7 +62,7 @@ class Walls(pygame.sprite.Group):
             """Overrides the method in sprite class."""
             pass
 
-    def __init__(self, grid_slots_wall):
+    def __init__(self, grid_slots_wall: Iterable[MapParticles.GridSlot]):
         """
         Constructor.
         """

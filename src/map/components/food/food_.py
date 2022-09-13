@@ -4,17 +4,19 @@
 
 
 from .food_status import FoodStatus
+from .food_type import FoodType
+from ..elementary import MapParticles
 import src.utils as utils
 
-from typing import Any
 from abc import ABC, abstractmethod
+from typing import Any
 import pygame
 
 
 class Food(pygame.sprite.Sprite, ABC):
     """Food class."""
 
-    def __init__(self, node):
+    def __init__(self, node: MapParticles.Node):
         """
         Constructor.
         """
@@ -65,12 +67,12 @@ class Food(pygame.sprite.Sprite, ABC):
         )
 
     @property
-    def node(self):
+    def node(self) -> MapParticles.Node:
         """Getter."""
         return self._node
 
     @property
-    def status(self):
+    def status(self) -> FoodStatus:
         """Getter."""
         return self._status
 
@@ -94,7 +96,7 @@ class Food(pygame.sprite.Sprite, ABC):
         self._alpha_value = alpha_value
         return None
 
-    def _is_faded(self):
+    def _is_faded(self) -> bool:
         """Callback function."""
         current_alpha = self.image.get_alpha()
         if current_alpha > 0:
@@ -102,56 +104,36 @@ class Food(pygame.sprite.Sprite, ABC):
         return True
 
     @status.setter
-    def status(self, other: FoodStatus):
+    def status(self, other: FoodStatus) -> None:
         """Setter."""
         self._status = other
 
-    def is_flashing(self):
+    def is_flashing(self) -> bool:
         """Getter."""
         return self._flashing_animation.counting
 
-    def set_flashing(self):
+    def set_flashing(self) -> None:
         """Setter."""
         if not self.is_flashing():
             self._flashing_animation.start()
 
-    def is_collecting(self):
+    def is_collecting(self) -> bool:
         """Getter."""
         return self._collect_animation.counting
 
-    def is_collected(self):
+    def is_collected(self) -> bool:
         """Getter."""
         return self._status == FoodStatus.COLLECTED
 
-    def collect(self):
+    def collect(self) -> None:
         """Collects the food object."""
         if self._status == FoodStatus.UNCOLLECTED:
             self._status = FoodStatus.COLLECTING
             self._collect_animation.start()
             self._fade_animation.start()
+        return None
 
-    @property
-    @abstractmethod
-    def type(self):
-        """Getter."""
-        pass
-
-    @property
-    @abstractmethod
-    def value(self):
-        """
-        Abstract method.
-        Returns the value (that is, score) when it's collected.
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def relevant_size(self):
-        """Returns the relevant size of the food object."""
-        pass
-
-    def _center(self):
+    def _center(self) -> tuple[int, int]:
         """Syntactic sugar method."""
         return self.node.pos_xy
 
@@ -165,3 +147,24 @@ class Food(pygame.sprite.Sprite, ABC):
         self.image = self._animation_images[self._current_image_index]
         self.image.set_alpha(self._alpha_value)
         self.rect = self.image.get_rect(center=self._center())
+
+    @property
+    @abstractmethod
+    def type(self) -> FoodType:
+        """Getter."""
+        pass
+
+    @property
+    @abstractmethod
+    def value(self) -> int:
+        """
+        Abstract method.
+        Returns the value (that is, score) when it's collected.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def relevant_size(self) -> float:
+        """Returns the relevant size of the food object."""
+        pass

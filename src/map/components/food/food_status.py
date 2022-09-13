@@ -3,7 +3,7 @@
 # author: Karlo Dimjašević
 
 
-from enum import Enum, unique, auto
+from enum import Enum, auto, unique
 
 
 @unique

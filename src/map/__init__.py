@@ -3,16 +3,18 @@
 # author: Karlo Dimjašević
 
 
-from .components import elementary, food, enemy_box, gate, walls
-from .map_ import load_maps
+from src.map.components import elementary, food, enemy_box, gate, walls
+from .map_ import Map, load_maps
 from .map_parser import MapParser
+
 
 __all__ = (
     "elementary",
-    "foods",
+    "food",
     "enemy_box",
     "gate",
     "walls",
+    "Map",
     "load_maps",
     "MapParser"
 )

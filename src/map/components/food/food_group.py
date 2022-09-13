@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
 
+from __future__ import annotations
 
 from .coin import Coin
-from .super_coin import SuperCoin
+from .food_ import Food
 from .food_status import FoodStatus
-from ..elementary.node_type import NodeType
+from .super_coin import SuperCoin
+from ..elementary import MapParticles, NodeType, Nodes
 import src.utils as utils
+
+from typing import Generator
 import pygame
 import random
 
@@ -15,7 +19,7 @@ import random
 class FoodGroup(pygame.sprite.Group):
     """Food group container."""
 
-    def __init__(self, food_nodes):
+    def __init__(self, food_nodes: Nodes[MapParticles.Node, ]):
         """Constructor."""
         self._food_nodes = food_nodes
         super().__init__()
@@ -31,13 +35,13 @@ class FoodGroup(pygame.sprite.Group):
             callback_function=self.flash_animation
         )
 
-    def _get_non_active_sprites(self):
+    def _get_non_active_sprites(self) -> Generator[Food, ]:
         """Method returns all sprites that currently doesn't perform animation."""
         for sprite in self.sprites():
             if not sprite.is_flashing() and sprite.status != FoodStatus.COLLECTED:
                 yield sprite
 
-    def flash_animation(self):
+    def flash_animation(self) -> None:
         """Method initiate flash animation for randomly selected food objects."""
         non_active_sprites = list(self._get_non_active_sprites())
         amount_of_needed_sprites = len(non_active_sprites) * utils.FOOD_PERCENTAGE_OF_FLASHING_OBJECTS_AT_ONCE.value
@@ -47,3 +51,4 @@ class FoodGroup(pygame.sprite.Group):
             random_sprite.set_flashing()
             non_active_sprites.remove(random_sprite)
             num_of_selected += 1
+        return None

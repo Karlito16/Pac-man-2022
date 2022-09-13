@@ -3,11 +3,15 @@
 # author: Karlo Dimjašević
 
 
+from __future__ import annotations
+from typing import Callable
+
+
 class Counter(object):
     """Counter class."""
 
-    def __init__(self, count_from: float, count_to: float, count_speed: float, step_function: callable,
-                 resolve_function: callable = None, count_int: bool = False, count_speed_power: float = 1.0,
+    def __init__(self, count_from: float, count_to: float, count_speed: float, step_function: Callable,
+                 resolve_function: Callable = None, count_int: bool = False, count_speed_power: float = 1.0,
                  count_repeat: int = 1, round_on: int = 5):
         """
         Constructor.
@@ -50,13 +54,14 @@ class Counter(object):
         """Getter."""
         return self._paused
 
-    def _reinit(self):
+    def _reinit(self) -> None:
         """Reinit."""
         self._current = self._count_from
         self._count_speed = self._count_speed_initial
         self._counting = True
         self._done = False
         self._paused = False
+        return None
 
     def start(self) -> None:
         """Starts the counting."""
@@ -67,6 +72,7 @@ class Counter(object):
     def _repeat(self) -> None:
         """Repeats the count."""
         self._reinit()
+        return None
 
     def pause(self) -> None:
         """Pauses the counting."""
@@ -76,17 +82,18 @@ class Counter(object):
     def unpause(self) -> None:
         """Unpause."""
         self._paused = False
+        return None
 
     def end(self) -> None:
         """Ends the counting."""
         self._counting = False
         return None
 
-    def _count_repeat_condition(self):
+    def _count_repeat_condition(self) -> bool:
         """Count repeat condition."""
         return self._current_repeat <= self._count_repeat or self._count_repeat == -1
 
-    def _count_next(self) -> float or None:
+    def _count_next(self) -> float | None:
         """Next."""
         if self._done:
             return None

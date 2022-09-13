@@ -3,14 +3,15 @@
 # author: Karlo Dimjašević
 
 
-import os
 from .directions import Directions
+from typing import Any
+import os
 
 
 class PacmanConstant(object):
     """Pacman constants."""
 
-    def __init__(self, value):
+    def __init__(self, value: Any):
         """
         Constructor
         :param value: any type
@@ -18,7 +19,7 @@ class PacmanConstant(object):
         self._value = value
 
     @property
-    def value(self):
+    def value(self) -> Any:
         """Getter."""
         return self._value
 
@@ -42,7 +43,7 @@ MAP_GRID_SLOT_NODE_SIZE_RELATION = PacmanConstant(2)
 MAP_NODE_SIZE = PacmanConstant(28)    # px
 MAP_GRID_SLOT_SIZE = PacmanConstant(MAP_NODE_SIZE.value // MAP_GRID_SLOT_NODE_SIZE_RELATION.value)    # px
 assert MAP_NODE_SIZE.value % MAP_GRID_SLOT_SIZE.value == 0, "map node size must be exactly 2 time bigger than grid slot size"
-MAP_NEIGHBOURS_DIRECTIONS_VALUES = PacmanConstant([-1, -2, 1, 2])
+MAP_NEIGHBOURS_DIRECTIONS_VALUES = PacmanConstant([2, 1, -2, -1])
 MAP_WALL_SIZE = PacmanConstant(2)
 MAP_WALL_COLOR = PacmanConstant("#010759")
 MAP_WALL_RADIUS = PacmanConstant(1)
@@ -71,6 +72,7 @@ FOOD_COLLECTING_ANIMATION_SPEED = PacmanConstant(0.075)
 FOOD_FADE_ANIMATION_SPEED = PacmanConstant(6)
 FOOD_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.15)     # relative from node size
 FOOD_SUPER_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.25)      # relative from node size
+FOOD_CHERRY_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.3)      # relative from node size
 
 # OTHER
 COLORS_ALPHA_MIN = PacmanConstant(255)

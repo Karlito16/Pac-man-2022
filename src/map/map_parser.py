@@ -3,12 +3,16 @@
 # author: Karlo Dimjašević
 
 
+from __future__ import annotations
+
+from src.map.components.elementary import Grid, MapParticles, NodeType, Nodes
 import src.utils as utils
-from .components.elementary import Grid, MapParticles, NodeType
+
+from typing import Any, Callable
 
 
-def _safe_evaluation(func):
-    def wrapper(*args, **kwargs):
+def _safe_evaluation(func: Callable) -> Callable:
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             evaluated_data = func(*args, **kwargs)
         except SyntaxError as e:
@@ -26,18 +30,13 @@ def _safe_evaluation(func):
 class MapParser(object):
     """Map parser class."""
 
-    def __init__(self):
-        """
-        Constructor.
-        """
-
     @staticmethod
     @_safe_evaluation
-    def _evaluate(string_value):
+    def _evaluate(string_value: str) -> Any:
         return eval(string_value)
 
     @staticmethod
-    def _all_valid(*args):
+    def _all_valid(*args: tuple[Any, ]) -> bool:
         """Checks if all arguments are valid and have some value."""
         for arg in args:
             if arg is None:
@@ -45,7 +44,7 @@ class MapParser(object):
         return True
 
     @staticmethod
-    def _parse_row(data_row):
+    def _parse_row(data_row: list[str, ]) -> list[Any, ] | int:
         """Parses the data row and checks it's validity."""
         parsed_data = list()
         for data in data_row:
@@ -55,7 +54,7 @@ class MapParser(object):
         return parsed_data
 
     @staticmethod
-    def parse(data):
+    def parse(data: str) -> tuple[tuple[int, int], Nodes, list[MapParticles.GridSlot, ]] | int:
         """
         Parses the given file data.
         :param data: file data ::str
