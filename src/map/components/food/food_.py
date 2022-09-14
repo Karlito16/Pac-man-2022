@@ -24,6 +24,8 @@ class Food(pygame.sprite.Sprite, ABC):
         self._node = node
         super().__init__()
 
+        setattr(self._node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value, self.collect)
+
         utils.import_assets(
             instance=self,
             attr_name="_animation_images",
@@ -123,13 +125,14 @@ class Food(pygame.sprite.Sprite, ABC):
         """Getter."""
         return self._status == FoodStatus.COLLECTED
 
-    def collect(self) -> None:
-        """Collects the food object."""
+    def collect(self) -> int:
+        """Collects the food object. Returns the value that food object holds."""
         if self._status == FoodStatus.UNCOLLECTED:
             self._status = FoodStatus.COLLECTING
             self._collect_animation.start()
             self._fade_animation.start()
-        return None
+            return self.value
+        return 0
 
     def _center(self) -> tuple[int, int]:
         """Syntactic sugar method."""

@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-from .directions import Directions
 import src.utils as utils
 
 from typing import TYPE_CHECKING
@@ -20,7 +19,7 @@ class Neighbours(dict):
         """Constructor."""
         super().__init__()
         for direction_value in utils.MAP_NEIGHBOURS_DIRECTIONS_VALUES.value:
-            self[Directions(direction_value)] = None
+            self[utils.Directions(direction_value)] = None
 
     def __str__(self) -> str:
         """To string method."""
@@ -33,7 +32,7 @@ class Neighbours(dict):
         """Representational method."""
         return self.__str__()
 
-    def add_new(self, direction: Directions, neighbour: Particle) -> bool:
+    def add_new(self, direction: utils.Directions, neighbour: Particle) -> bool:
         """
         Adds a new neighbour to the given side.
         Side must be integer in range [0, 3] (Direction enum!).
@@ -41,7 +40,11 @@ class Neighbours(dict):
         :param neighbour:
         :return:
         """
-        if direction != Directions.UNDEFINED:
+        if direction != utils.Directions.UNDEFINED:
             self[direction] = neighbour
             return True
         return False
+
+    def get(self, direction: utils.Directions) -> Particle | None:
+        """Returns the neighbour on the given direction."""
+        return self[direction]

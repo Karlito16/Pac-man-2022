@@ -2,13 +2,18 @@
 # -*- coding: utf-8 -*-
 # author: Karlo Dimjašević
 
+
+from __future__ import annotations
+
 from src.map.components.characters.character_type import CharacterType
-from src.map.components.elementary import MapParticles
 from abc import ABC
 import src.utils as utils
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
 import pygame
+
+if TYPE_CHECKING:
+    from src.map.components.elementary import MapParticles
 
 
 class Character(pygame.sprite.Sprite, ABC):
@@ -35,6 +40,8 @@ class Character(pygame.sprite.Sprite, ABC):
 
         self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
         self._moving = True
+        self._current_node = self._starting_node
+        self._future_node = self._current_node.neighbours.get(direction=self._moving_direction)
         self._current_animation_index = 0
         self._x, self._y = self._starting_node.pos_xy
         self.image = getattr(self, self._current_animation_assets_attr_name)[self._current_animation_index]
@@ -61,6 +68,7 @@ class Character(pygame.sprite.Sprite, ABC):
     def moving_direction(self, other: utils.Directions) -> None:
         if other != utils.Directions.UNDEFINED:
             self._moving_direction = other
+            self.set_future_node()
 
     @property
     def moving(self) -> bool:
@@ -73,6 +81,27 @@ class Character(pygame.sprite.Sprite, ABC):
         self._moving = other
 
     @property
+    def position(self) -> tuple[float, float]:
+        """Getter."""
+        return self._x, self._y
+
+    @property
+    def current_node(self) -> MapParticles.BigNode:
+        """Getter."""
+        return self._current_node
+
+    def set_current_node(self) -> None:
+        """Setter. Syntatic sugar method."""
+        self._current_node = self._future_node
+        return None
+
+    def set_future_node(self) -> None:
+        """Setter."""
+        self._future_node = self._current_node.neighbours.get(direction=self._moving_direction)
+        self.moving = self._future_node is not None
+        return None
+
+    @property
     def _current_animation_assets_attr_name(self) -> str:
         """Returns the attribute name."""
         return f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
@@ -81,6 +110,15 @@ class Character(pygame.sprite.Sprite, ABC):
         """Returns the new image object."""
         return getattr(self, self._current_animation_assets_attr_name)[self._current_image_index]
 
+    def _check_current_node(self) -> bool:
+        """Method checks if character is still over the current node, or not."""
+        check_func = lambda c1, c2: abs(c1 - c2) <= self._future_node.size * utils.CHARACTER_CHECKING_POSITION_AXES_THRESHOLD.value
+        if all(check_func(c1=cord_1, c2=cord_2) for cord_1, cord_2 in zip(self.position, self._future_node.pos_xy)):
+            self.set_current_node()
+            self.set_future_node()
+            return True
+        return False
+
     def move(self) -> None:
         """Moves the character."""
         self._x, self._y = (
@@ -88,6 +126,7 @@ class Character(pygame.sprite.Sprite, ABC):
                 (self._x, self._y), utils.DIRECTIONS_COORDINATES_DIFFERENCE.value[self._moving_direction]
             )
         )
+        self._check_current_node()
         return None
 
     def _set_current_image_index(self, index: int) -> None:

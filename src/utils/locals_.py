@@ -6,6 +6,7 @@
 from .directions import Directions
 from typing import Any
 import os
+import pygame
 
 
 class PacmanConstant(object):
@@ -75,13 +76,19 @@ FOOD_FADE_ANIMATION_SPEED = PacmanConstant(6)
 FOOD_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.15)     # relative from node size
 FOOD_SUPER_COIN_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.25)      # relative from node size
 FOOD_CHERRY_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.3)      # relative from node size
+FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME = PacmanConstant("collect_food")
 
 # CHARACTERS
-CHARACTER_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.8)    # relative from node size
+CHARACTER_RELEVANT_SIZE_PERCENTAGE = PacmanConstant(0.6)    # relative from node size
 CHARACTER_DEFAULT_DIRECTION = PacmanConstant(Directions.LEFT)
 CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME = PacmanConstant("_animation_images_")
-CHARACTER_MOVING_SPEED = PacmanConstant(3)
+CHARACTER_MOVING_SPEED_PERCENTAGE = PacmanConstant(0.05)     # moves n% of node size by frame
+CHARACTER_CHECKING_POSITION_AXES_THRESHOLD = PacmanConstant(0.025)
+assert CHARACTER_MOVING_SPEED_PERCENTAGE.value > CHARACTER_CHECKING_POSITION_AXES_THRESHOLD.value,\
+    "Checking position axes threshold percentage must be lower than moving speed percentage!"
 CHARACTER_MOVING_ANIMATION_SPEED = PacmanConstant(0.1)
+CHARACTER_MOVING_KEYS = PacmanConstant([pygame.K_UP, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT])
+CHARACTER_LOOK_FOR_BIG_NODE_TRESHOLD = PacmanConstant(3)   # must be maximum 4 nodes distanced from the big node in order to apply direction change
 
 # OTHER
 COLORS_ALPHA_MIN = PacmanConstant(255)
