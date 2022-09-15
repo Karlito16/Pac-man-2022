@@ -81,7 +81,7 @@ class MapParser(object):
                 return -1
 
             # unpack valid data values
-            pos_1_real, pos_2_real, type_1, type_2 = parsed_data_row
+            pos_1_real, pos_2_real, type_1, type_2, type_others = parsed_data_row
 
             # calculate the vertically symmetrical positions
             pos_1_symm = (grid.cols - pos_1_real[0], pos_1_real[1])
@@ -97,7 +97,12 @@ class MapParser(object):
                 MapParticles.BigNode.big_connect(big_node_1=big_node_1, big_node_2=big_node_2, direction=direction)  # big neighbours
 
                 # create all sub-nodes between two big nodes, with appropriate type
-                sub_nodes = grid.create_sub_nodes(from_node=big_node_1, to_node=big_node_2, direction=direction)  # generator
+                sub_nodes = grid.create_sub_nodes(
+                    from_node=big_node_1,
+                    to_node=big_node_2,
+                    direction=direction,
+                    sub_nodes_type=type_others
+                )  # generator
 
                 # set-up little neighbours
                 nodes = [big_node_1] + list(sub_nodes) + [big_node_2]

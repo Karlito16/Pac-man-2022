@@ -17,3 +17,5 @@ class NodeType(Enum):
     ENEMY_IN = 4
     GATE = 5
     PACMAN = 6
+    PASSAGE = 7
+    BRIDGE = 8

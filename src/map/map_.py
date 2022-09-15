@@ -40,6 +40,7 @@ class Map(pygame.Surface):
                 components.elementary.NodeType.SUPER
             )
         )
+        self._passages = components.Passages(passage_nodes=self._nodes.get_all_by_type(components.elementary.NodeType.PASSAGE))
         self._pacman = Pacman(starting_node=next(self._nodes.get_all_by_type(components.elementary.NodeType.PACMAN)))
         self._pacman_group = pygame.sprite.GroupSingle(self._pacman)
 
@@ -67,6 +68,11 @@ class Map(pygame.Surface):
     def food(self) -> components.FoodGroup:
         """Getter."""
         return self._food
+
+    @property
+    def passages(self) -> components.Passages:
+        """Getter."""
+        return self._passages
 
     @property
     def pacman(self) -> Pacman:

@@ -7,6 +7,7 @@ from .elementary import grid, map_particles, nodes
 from .food import *
 from .enemy_box import EnemyBox
 from .gate import Gate
+from .passages import Passages
 from .walls import Walls
 
 
@@ -16,5 +17,6 @@ __all__ = (
     "nodes",
     "EnemyBox",
     "Gate",
+    "Passages",
     "Walls"
 )

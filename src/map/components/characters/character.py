@@ -5,7 +5,8 @@
 
 from __future__ import annotations
 
-from src.map.components.characters.character_type import CharacterType
+from .character_type import CharacterType
+from src.map.components.elementary import NodeType
 from abc import ABC
 import src.utils as utils
 
@@ -42,6 +43,7 @@ class Character(pygame.sprite.Sprite, ABC):
         self._moving = True
         self._current_node = self._starting_node
         self._future_node = self._current_node.neighbours.get(direction=self._moving_direction)
+        self._on_bridge = False
         self._current_animation_index = 0
         self._x, self._y = self._starting_node.pos_xy
         self.image = getattr(self, self._current_animation_assets_attr_name)[self._current_animation_index]
@@ -66,7 +68,7 @@ class Character(pygame.sprite.Sprite, ABC):
 
     @moving_direction.setter
     def moving_direction(self, other: utils.Directions) -> None:
-        if other != utils.Directions.UNDEFINED:
+        if other != utils.Directions.UNDEFINED and self.current_node.type != NodeType.BRIDGE:
             self._moving_direction = other
             self.set_future_node()
 
@@ -93,6 +95,7 @@ class Character(pygame.sprite.Sprite, ABC):
     def set_current_node(self) -> None:
         """Setter. Syntatic sugar method."""
         self._current_node = self._future_node
+        self._x, self._y = self._current_node.pos_xy
         return None
 
     def set_future_node(self) -> None:
@@ -119,6 +122,17 @@ class Character(pygame.sprite.Sprite, ABC):
             return True
         return False
 
+    def _check_passage(self) -> bool:
+        """Method checks if character is about to pass the map from the one side to the another."""
+        if self.current_node.type == NodeType.BRIDGE:
+            if not self._on_bridge:
+                self.set_current_node()
+                self.set_future_node()
+                self._on_bridge = True
+        else:
+            self._on_bridge = False
+        return self._on_bridge
+
     def move(self) -> None:
         """Moves the character."""
         self._x, self._y = (
@@ -127,6 +141,7 @@ class Character(pygame.sprite.Sprite, ABC):
             )
         )
         self._check_current_node()
+        self._check_passage()
         return None
 
     def _set_current_image_index(self, index: int) -> None:

@@ -52,19 +52,19 @@ class Food(pygame.sprite.Sprite, ABC):
             count_to=utils.FOOD_COLLECTING_ANIMATION_MAX_SIZE_PERCENTAGE.value,
             count_speed=utils.FOOD_COLLECTING_ANIMATION_SPEED.value,
             step_function=self._scale_images,
-            resolve_function=lambda: self._scale_images(scale_factor=0)
+            resolve_function=self._end_collect_animation
         )
         self._fade_animation = utils.ConditionalCounter(
             condition_function=self._is_faded,
             count_from=utils.COLORS_ALPHA_MIN.value,
             count_speed=-utils.FOOD_FADE_ANIMATION_SPEED.value,
             step_function=self._set_alpha,
-            resolve_function=lambda: self._set_alpha(alpha_value=utils.COLORS_ALPHA_MAX.value),
+            resolve_function=self._end_fade_animation,
             count_int=True
         )
 
     @property
-    def node(self) -> MapParticles.Node:
+    def node(self) -> MapParticles.Node | MapParticles.BigNode:
         """Getter."""
         return self._node
 
@@ -72,6 +72,11 @@ class Food(pygame.sprite.Sprite, ABC):
     def status(self) -> FoodStatus:
         """Getter."""
         return self._status
+
+    @status.setter
+    def status(self, other: FoodStatus) -> None:
+        """Setter."""
+        self._status = other
 
     def _set_current_image_index(self, index: int) -> None:
         """Callback function."""
@@ -96,17 +101,28 @@ class Food(pygame.sprite.Sprite, ABC):
         self._alpha_value = alpha_value
         return None
 
+    def _end_collect_animation(self) -> None:
+        """Resolve function."""
+        self._scale_images(scale_factor=0)
+        if not self._fade_animation.counting:
+            self._flashing_animation.end()
+            self._status = FoodStatus.COLLECTED
+        return None
+
+    def _end_fade_animation(self) -> None:
+        """Resolve function."""
+        self._set_alpha(alpha_value=utils.COLORS_ALPHA_MAX.value)
+        if not self._collect_animation.counting:
+            self._flashing_animation.end()
+            self._status = FoodStatus.COLLECTED
+        return None
+
     def _is_faded(self) -> bool:
         """Callback function."""
         current_alpha = self.image.get_alpha()
         if current_alpha > 0:
             return False
         return True
-
-    @status.setter
-    def status(self, other: FoodStatus) -> None:
-        """Setter."""
-        self._status = other
 
     def is_flashing(self) -> bool:
         """Getter."""
@@ -119,7 +135,7 @@ class Food(pygame.sprite.Sprite, ABC):
 
     def is_collecting(self) -> bool:
         """Getter."""
-        return self._collect_animation.counting
+        return self._status == FoodStatus.COLLECTING
 
     def is_collected(self) -> bool:
         """Getter."""

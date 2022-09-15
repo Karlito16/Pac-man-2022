@@ -52,3 +52,10 @@ class FoodGroup(pygame.sprite.Group):
             non_active_sprites.remove(random_sprite)
             num_of_selected += 1
         return None
+
+    def get_sprite_by_node(self, node: MapParticles.Node | MapParticles.BigNode) -> Food | None:
+        """Returns food object that is made of given node."""
+        for food in self.sprites():
+            if food.node == node:
+                return food
+        return None

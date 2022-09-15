@@ -156,7 +156,7 @@ class Grid(dict):
             raise TypeError(f"invalid type range: {from_node_type} - {to_node_type}")
         return type_
 
-    def create_sub_nodes(self, from_node: MapParticles.BigNode, to_node: MapParticles.BigNode, direction: utils.Directions = None) -> Generator[MapParticles.Node] | None:
+    def create_sub_nodes(self, from_node: MapParticles.BigNode, to_node: MapParticles.BigNode, sub_nodes_type: NodeType, direction: utils.Directions = None) -> Generator[MapParticles.Node] | None:
         """Creates sub nodes between two big nodes, with appropriate node type."""
         direction = direction if direction is not None else MapParticles.Node.get_direction(
             particle1=from_node,
@@ -169,7 +169,8 @@ class Grid(dict):
             diff_i, diff_j = utils.DIRECTIONS_COORDINATES_DIFFERENCE.value[direction]
             start_i, start_j = from_node.pos
             n = int(from_node - to_node) - 1  # number of sub nodes which will be created
-            sub_nodes_type = Grid._get_sub_nodes_type(from_node_type=from_node.type, to_node_type=to_node.type)
+            # sub_nodes_type = Grid._get_sub_nodes_type(from_node_type=from_node.type, to_node_type=to_node.type)
+            sub_nodes_type = NodeType(sub_nodes_type)
 
             for node_index in range(1, n + 1):
                 node = self.create_node(
