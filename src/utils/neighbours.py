@@ -45,6 +45,6 @@ class Neighbours(dict):
             return True
         return False
 
-    def get(self, direction: utils.Directions) -> Particle | None:
+    def get(self, direction: utils.Directions) -> __class__:
         """Returns the neighbour on the given direction."""
         return self[direction]

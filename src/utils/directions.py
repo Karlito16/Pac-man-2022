@@ -7,6 +7,7 @@ from __future__ import annotations
 from enum import Enum, unique
 import pygame
 
+
 @unique
 class Directions(Enum):
     """All possible directions."""

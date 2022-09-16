@@ -46,7 +46,7 @@ MAP_NODE_SIZE = PacmanConstant(28)    # px
 MAP_GRID_SLOT_SIZE = PacmanConstant(MAP_NODE_SIZE.value // MAP_GRID_SLOT_NODE_SIZE_RELATION.value)    # px
 assert MAP_NODE_SIZE.value % MAP_GRID_SLOT_SIZE.value == 0, "map node size must be exactly 2 time bigger than grid slot size"
 MAP_NEIGHBOURS_DIRECTIONS_VALUES = PacmanConstant([2, 1, -2, -1])
-MAP_WALL_SIZE = PacmanConstant(2)
+MAP_WALL_SIZE = PacmanConstant(9)   # keep this value odd!
 MAP_WALL_COLOR = PacmanConstant("#010759")
 MAP_WALL_RADIUS = PacmanConstant(1)
 MAP_MARGIN_TOP_PERCENTAGE = PacmanConstant(0.2)     # 20% of the total win height

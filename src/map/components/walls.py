@@ -16,6 +16,13 @@ class Walls(pygame.sprite.Group):
     class Wall(pygame.sprite.Sprite):
         """Wall class."""
 
+        _DIRECTION_LINE_POINTS_DICT = {
+            utils.Directions.TOP: (lambda rect: (rect.topleft, rect.topright)),
+            utils.Directions.RIGHT: (lambda rect: (rect.topright, rect.bottomright)),
+            utils.Directions.BOTTOM: (lambda rect: (rect.bottomleft, rect.bottomright)),
+            utils.Directions.LEFT: (lambda rect: (rect.topleft, rect.bottomleft))
+        }
+
         def __init__(self, grid_slot: MapParticles.GridSlot, wall_size: int, wall_color: str, wall_radius: int):
             """
             Constructor.
@@ -25,14 +32,7 @@ class Walls(pygame.sprite.Group):
             self._wall_color = wall_color
             self._wall_radius = wall_radius
             super().__init__()
-            self.image = pygame.Surface((self._grid_slot.size, self._grid_slot.size))
-            self.rect = pygame.draw.rect(
-                surface=self.image,
-                color=self._wall_color,
-                rect=self.image.get_rect(),
-                width=self.wall_size,
-                border_radius=self._wall_radius
-            )
+            self.image, self.rect = self._init_wall()
             self.rect.topleft = (
                 self._grid_slot.size * self._grid_slot.i,
                 self._grid_slot.size * self._grid_slot.j
@@ -57,6 +57,22 @@ class Walls(pygame.sprite.Group):
         def wall_radius(self) -> int:
             """Getter."""
             return self._wall_radius
+
+        def _init_wall(self) -> tuple[pygame.Surface, pygame.Rect]:
+            """Inits the wall surface."""
+            surface = pygame.Surface((self._grid_slot.size, self._grid_slot.size))
+            rect = surface.get_rect()
+            rect.inflate_ip(-1, -1)
+            for direction in (direction for direction in utils.Directions if direction != utils.Directions.UNDEFINED):
+                neighbour = self._grid_slot.neighbours.get(direction=direction)
+                if not neighbour or neighbour.is_path():
+                    pygame.draw.line(
+                        surface,
+                        self.wall_color,
+                        *Walls.Wall._DIRECTION_LINE_POINTS_DICT[direction](rect=rect),
+                        width=self.wall_size
+                    )
+            return surface, rect
 
         def update(self, *args: Any, **kwargs: Any) -> None:
             """Overrides the method in sprite class."""

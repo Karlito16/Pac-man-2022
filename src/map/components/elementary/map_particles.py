@@ -73,6 +73,14 @@ class MapParticles(object):
             """Getter."""
             return self._nodes
 
+        def is_wall(self) -> bool:
+            """Getter."""
+            return self.type == GridSlotType.WALL
+
+        def is_path(self) -> bool:
+            """Getter."""
+            return self.type == GridSlotType.PATH
+
     class BigNode(Node):
         """BigNode class."""
 
