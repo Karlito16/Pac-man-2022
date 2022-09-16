@@ -18,6 +18,7 @@ def new_nodes(func: Callable) -> Callable:
     def wrapper(*args, **kwargs):
         nodes = Nodes()
         result = func(*args, **kwargs)
+
         nodes.add_nodes(*result)
         return nodes
     return wrapper
@@ -40,7 +41,9 @@ class Nodes(dict):
     def __next__(self):
         if not hasattr(self, "_index") or not hasattr(self, "_iter_values"):
             self.__iter__()
-        if self._index >= len(self._iter_values):
+        if len(self._iter_values) == 0:
+            return None
+        elif self._index >= len(self._iter_values):
             raise StopIteration()
         next_ = self._iter_values[self._index]
         self._index += 1
@@ -58,9 +61,9 @@ class Nodes(dict):
         self[node.j].add(node)
         return None
 
-    def add_nodes(self, node: MapParticles.Node, *args: MapParticles.Node) -> None:
+    def add_nodes(self, *args: MapParticles.Node) -> None:
         """Adds multiple nodes in the node array."""
-        for node_ in [node] + list(args):
+        for node_ in list(args):
             self.add_node(node=node_)
         return None
 

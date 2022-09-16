@@ -87,8 +87,8 @@ class Map(pygame.Surface):
     def update(self) -> None:
         """Updates the map."""
         # check collides
-        if pygame.sprite.spritecollideany(sprite=self.pacman, group=self.walls):
-            self.pacman.moving = False
+        # if pygame.sprite.spritecollideany(sprite=self.pacman, group=self.walls):
+        #     self.pacman.moving = False
 
         # update
         self.food.update()

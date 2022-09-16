@@ -38,7 +38,7 @@ class FoodGroup(pygame.sprite.Group):
     def _get_non_active_sprites(self) -> Generator[Food, ]:
         """Method returns all sprites that currently doesn't perform animation."""
         for sprite in self.sprites():
-            if not sprite.is_flashing() and sprite.status != FoodStatus.COLLECTED:
+            if not sprite.is_flashing() and not sprite.is_collected():
                 yield sprite
 
     def flash_animation(self) -> None:

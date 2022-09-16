@@ -30,13 +30,13 @@ class CycleCounter(Counter):
         super().start()
         return None
 
-    @classmethod
-    def _max_sum(cls, speed: float) -> float:
-        """Max sum of speeds which sum does not go over int interval (1)."""
-        s = 0
-        while s < CycleCounter._INT_INTERVAL:
-            s += speed
-        return s - speed
+    def _reinit(self) -> None:
+        """Overrides the method in counter class."""
+        self._count_speed_func = self._pow_n_func
+        self._direction = CycleCounter._POSITIVE
+        super()._reinit()
+        self._cutoff_edge(from_=self._current)
+        return None
 
     def _count_next(self) -> float | None:
         """Override."""
@@ -50,9 +50,7 @@ class CycleCounter(Counter):
             self._direction = CycleCounter._NEGATIVE
             self._count_speed_func = self._root_n_func if self._maintain_count_speed else self._count_speed_func
             self._count_speed = self._count_speed_func(self._count_speed)
-            self._current = self._current + (self._count_speed * self._direction) \
-                if not self._count_int \
-                else self._current + CycleCounter._max_sum(speed=self._count_speed) * self._direction
+            self._cutoff_edge(from_=self._current)
         elif next_val < self._count_from and self._direction == CycleCounter._NEGATIVE:
             # cycle end
             self._done = True
@@ -61,3 +59,18 @@ class CycleCounter(Counter):
 
         self._count_speed = self._count_speed_func(self._count_speed)
         return ret_val
+
+    def _cutoff_edge(self, from_: float) -> None:
+        """Method cuts-off the duration of the values that are on the edges. For example:..."""
+        self._current = from_ + (self._count_speed * self._direction) \
+            if not self._count_int \
+            else from_ + CycleCounter._max_sum(speed=self._count_speed) * self._direction
+        return None
+
+    @classmethod
+    def _max_sum(cls, speed: float) -> float:
+        """Max sum of speeds which sum does not go over int interval (1)."""
+        s = 0
+        while s < CycleCounter._INT_INTERVAL:
+            s += speed
+        return s - speed

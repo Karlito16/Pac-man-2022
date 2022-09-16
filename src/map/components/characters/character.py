@@ -9,6 +9,7 @@ from .character_type import CharacterType
 from src.map.components.elementary import NodeType
 from abc import ABC
 import src.utils as utils
+import src.utils.animations as animations
 
 from typing import Any, TYPE_CHECKING
 import pygame
@@ -27,7 +28,14 @@ class Character(pygame.sprite.Sprite, ABC):
         self._moving_speed = moving_speed
         super().__init__()
 
+        self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
+        self._moving = True
+        self._current_node = self._starting_node
+        self._future_node = self._current_node.neighbours.get(direction=self._moving_direction)
+        self._on_bridge = False
+        self._x, self._y = self._starting_node.pos_xy
         self._relevant_size = self._starting_node.size * utils.CHARACTER_RELEVANT_SIZE_PERCENTAGE.value
+
         # imports the assets for walking and for dying
         for side_name in [key.name.lower() for key in utils.Directions if key != utils.Directions.UNDEFINED] + ["death"]:
             utils.import_assets(
@@ -35,30 +43,12 @@ class Character(pygame.sprite.Sprite, ABC):
                 attr_name=f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{side_name}",
                 directory=f"{utils.CHARACHERS_DIR.value}\\{self._character_type.name}",
                 relevant_size=self._relevant_size,
-                directory_constraints=[side_name, "full"],
+                directory_constraints=[side_name],
                 wshadow=True
             )
 
-        self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
-        self._moving = True
-        self._current_node = self._starting_node
-        self._future_node = self._current_node.neighbours.get(direction=self._moving_direction)
-        self._on_bridge = False
-        self._current_animation_index = 0
-        self._x, self._y = self._starting_node.pos_xy
-        self.image = getattr(self, self._current_animation_assets_attr_name)[self._current_animation_index]
-        self.rect = self.image.get_rect(center=(self._x, self._y))
-
         # animations
-        self._moving_animation = utils.Counter(
-            count_from=0,
-            count_to=len(getattr(self, self._current_animation_assets_attr_name)),
-            count_speed=utils.CHARACTER_MOVING_ANIMATION_SPEED.value,
-            step_function=self._set_current_image_index,
-            resolve_function=lambda: self._set_current_image_index(index=0),
-            count_int=True,
-            count_repeat=-1     # infinity
-        )
+        self._moving_animation = animations.MovingAnimation(instance=self)
         self._moving_animation.start()
 
     @property
@@ -105,13 +95,9 @@ class Character(pygame.sprite.Sprite, ABC):
         return None
 
     @property
-    def _current_animation_assets_attr_name(self) -> str:
+    def current_animation_assets_attr_name(self) -> str:
         """Returns the attribute name."""
         return f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
-
-    def get_image(self) -> pygame.Surface:
-        """Returns the new image object."""
-        return getattr(self, self._current_animation_assets_attr_name)[self._current_image_index]
 
     def _check_current_node(self) -> bool:
         """Method checks if character is still over the current node, or not."""
@@ -144,19 +130,11 @@ class Character(pygame.sprite.Sprite, ABC):
         self._check_passage()
         return None
 
-    def _set_current_image_index(self, index: int) -> None:
-        """Callback function."""
-        self._current_image_index = index
-        return None
-
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Method updates food object."""
-        # animations
-        self._moving_animation.next()
-
         # movement
         if self.moving:
             self.move()
 
-        self.image = self.get_image()
-        self.rect = self.image.get_rect(center=(self._x, self._y))
+        # animations
+        self._moving_animation.update()

@@ -38,6 +38,8 @@ class Pacman(Character):
         node = self.current_node
         for _ in range(utils.CHARACTER_LOOK_FOR_BIG_NODE_TRESHOLD.value):
             next_node = node.neighbours.get(direction=self.moving_direction)
+            if next_node is None:
+                break
             if isinstance(next_node, MapParticles.BigNode) and next_node.neighbours.get(direction=future_move):
                 return next_node
             node = next_node

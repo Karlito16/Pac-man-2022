@@ -86,7 +86,7 @@ CHARACTER_MOVING_SPEED_PERCENTAGE = PacmanConstant(0.05)     # moves n% of node 
 CHARACTER_CHECKING_POSITION_AXES_THRESHOLD = PacmanConstant(0.025)
 assert CHARACTER_MOVING_SPEED_PERCENTAGE.value > CHARACTER_CHECKING_POSITION_AXES_THRESHOLD.value,\
     "Checking position axes threshold percentage must be lower than moving speed percentage!"
-CHARACTER_MOVING_ANIMATION_SPEED = PacmanConstant(0.1)
+CHARACTER_MOVING_ANIMATION_SPEED = PacmanConstant(0.2)
 CHARACTER_MOVING_KEYS = PacmanConstant([pygame.K_UP, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT])
 CHARACTER_LOOK_FOR_BIG_NODE_TRESHOLD = PacmanConstant(3)   # must be maximum 4 nodes distanced from the big node in order to apply direction change
 
