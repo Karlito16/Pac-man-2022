@@ -62,20 +62,19 @@ class Pacman(Character):
         else:
             self._set_future_move(future_move=other)
 
-    def move(self) -> None:
-        """Overrides the method in Character class."""
-        super().move()
+    def intersection(self) -> None:
+        """Overrides in Character."""
         if self.current_node == self._future_big_node:
             super(Pacman, self.__class__).moving_direction.fset(self, self._future_moving_direction)
             self._set_future_move()     # resets
         return None
 
-    def eat(self) -> None:
-        """Eating."""
-        if hasattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value):
-            score = getattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value)()
-
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Overrides the method from the Character class."""
         super().update(args, kwargs)
         self.eat()
+
+    def eat(self) -> None:
+        """Eating."""
+        if hasattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value):
+            score = getattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value)()

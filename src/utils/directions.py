@@ -18,12 +18,12 @@ class Directions(Enum):
     LEFT = -1
     UNDEFINED = 0
 
-    @staticmethod
-    def get_opposite(direction: Directions) -> Directions:
+    @classmethod
+    def get_opposite(cls, direction: Directions) -> Directions:
         """Returns the opposite direction."""
-        if isinstance(direction, Directions):
-            return Directions(-1 * direction.value)
-        return Directions.UNDEFINED
+        if isinstance(direction, cls):
+            return cls(-1 * direction.value)
+        return cls.UNDEFINED
 
     @staticmethod
     def get_direction_by_keypress(key: pygame.key) -> Directions:

@@ -49,6 +49,10 @@ class MapParticles(object):
             """Returns position in pixels."""
             return self.x, self.y
 
+        def is_big_node(self) -> bool:
+            """Returns if node is instance of MapParticles.BigNode."""
+            return isinstance(self, MapParticles.BigNode)
+
         def check_for_possible_neighbours(self) -> list:
             """Node itself checks for all of the four possible neighbours."""
             possible_neighbours = dict()

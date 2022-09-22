@@ -62,15 +62,15 @@ class Path(object):
     @classmethod
     def find_shortest(cls, from_node: NODE_T, to_node: NODE_T) -> list[MapParticles.BigNode]:
         """Dijkstra algorithm: finds the shortest path from from_node to to_node."""
-        from_node, to_node, nodes = cls._setup_nodes(from_node=from_node, to_node=to_node)
+        from_node_cpy, to_node_cpy, nodes = cls._setup_nodes(from_node=from_node, to_node=to_node)
         if not nodes:   # case when both nodes are within same "neighbourhood"
             return []
 
         cls._init_distances(nodes=nodes)
-        cls._distances[from_node] = (0, None)
+        cls._distances[from_node_cpy] = (0, None)
 
         visited_nodes = set()
-        new_visited_node = from_node
+        new_visited_node = from_node_cpy
         found_neighbours = set()
         while True:
             visited_nodes.add(new_visited_node)
@@ -88,7 +88,7 @@ class Path(object):
                     neighbour_cpy.distance = distance
                     found_neighbours.add(neighbour_cpy)
 
-            if not found_neighbours and to_node in visited_nodes:
+            if not found_neighbours and to_node_cpy in visited_nodes:
                 break
 
             new_visited_node = min(found_neighbours)
@@ -100,9 +100,10 @@ class Path(object):
 
         path = list()
         path.append(to_node)
-        previous_node = cls._distances[to_node][1]
+        previous_node = cls._distances[to_node_cpy][1]
         while previous_node:
             path.insert(0, previous_node)
             previous_node = cls._distances[previous_node][1]
-
+        path.pop(0)
+        path.insert(0, from_node)
         return path

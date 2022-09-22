@@ -91,9 +91,14 @@ class Neighbours(dict):
         """Returns the neighbour on the given direction."""
         return self[direction]
 
-    def get_all(self) -> Iterable[Particle]:
+    def get_all(self) -> Generator[Particle]:
         """Returns all neighbours's node."""
-        return (neighbour.node for neighbour in self.values())
+        return (neighbour.node for neighbour in self.values() if neighbour)
+
+    def get_all_directions(self) -> Generator[utils.Directions]:
+        """Returns all directions."""
+        for direction in self:
+            yield direction if self[direction] else None
 
     def get_all_with_distance(self) -> Iterable[Particle]:
         """Returns all neighbours."""

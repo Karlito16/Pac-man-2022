@@ -10,6 +10,7 @@ from src.map.components.elementary import Nodes
 import src.map.components as components
 from .map_parser import MapParser
 import src.utils as utils
+import src.utils.path as path
 
 import pygame
 from typing import Generator, Iterable
@@ -40,10 +41,13 @@ class Map(pygame.Surface):
                 components.elementary.NodeType.SUPER
             )
         )
+
         self._passages = components.Passages(
             passage_nodes=self._nodes.get_all_by_type(components.elementary.NodeType.PASSAGE),
-            all_nodes=self._nodes
+            all_nodes=self._nodes       # updates the self._nodes with bridges!
         )
+        path.Path.init_nodes(nodes=self._nodes)  # important!
+
         self._pacman = components.Pacman(starting_node=next(self._nodes.get_all_by_type(components.elementary.NodeType.PACMAN)))
         self._pacman_group = pygame.sprite.GroupSingle(self._pacman)
         self._enemies = components.Enemies(

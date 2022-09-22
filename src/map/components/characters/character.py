@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from .character_type import CharacterType
 from src.map.components.elementary import NodeType
-from abc import ABC
+from abc import ABC, abstractmethod
 import src.utils as utils
 import src.utils.animations as animations
 
@@ -29,9 +29,11 @@ class Character(pygame.sprite.Sprite, ABC):
         super().__init__()
 
         self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
-        self._moving = True
+        self._on_intersection = False
+        self._previous_node = None
         self._current_node = self._starting_node
-        self._future_node = self._current_node.neighbours.get(direction=self._moving_direction)
+        self._moving, self._future_node = None, None
+        self.set_future_node()
         self._on_bridge = False
         self._x, self._y = self._starting_node.pos_xy
         self._relevant_size = self._starting_node.size * utils.CHARACTER_RELEVANT_SIZE_PERCENTAGE.value
@@ -73,19 +75,50 @@ class Character(pygame.sprite.Sprite, ABC):
         self._moving = other
 
     @property
+    def on_intersection(self) -> bool:
+        """Getter."""
+        return self._on_intersection
+
+    def is_on_intersection(self) -> bool:
+        """Getter."""
+        return self.current_node.is_big_node()
+
+    @abstractmethod
+    def intersection(self) -> None:
+        """Method is called when character is on the intersection for the first time. Must be overrided."""
+        pass
+
+    @property
     def position(self) -> tuple[float, float]:
         """Getter."""
         return self._x, self._y
+
+    @property
+    def previous_node(self) -> MapParticles.BigNode:
+        """Getter."""
+        return self._previous_node
 
     @property
     def current_node(self) -> MapParticles.BigNode:
         """Getter."""
         return self._current_node
 
+    @property
+    def future_node(self) -> MapParticles.BigNode:
+        """Getter."""
+        return self._future_node
+
+    @property
+    def current_animation_assets_attr_name(self) -> str:
+        """Returns the attribute name."""
+        return f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
+
     def set_current_node(self) -> None:
         """Setter. Syntatic sugar method."""
+        self._previous_node = self._current_node
         self._current_node = self._future_node
         self._x, self._y = self._current_node.pos_xy
+        self._on_intersection = False
         return None
 
     def set_future_node(self) -> None:
@@ -94,43 +127,48 @@ class Character(pygame.sprite.Sprite, ABC):
         self.moving = self._future_node is not None
         return None
 
-    @property
-    def current_animation_assets_attr_name(self) -> str:
-        """Returns the attribute name."""
-        return f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
-
-    def _check_current_node(self) -> bool:
+    def check_current_node(self) -> bool:
         """Method checks if character is still over the current node, or not."""
         check_func = lambda c1, c2: abs(c1 - c2) <= self._future_node.size * utils.CHARACTER_CHECKING_POSITION_AXES_THRESHOLD.value
         if self._future_node and all(check_func(c1=cord_1, c2=cord_2) for cord_1, cord_2 in zip(self.position, self._future_node.pos_xy)):
-            self.set_current_node()
-            self.set_future_node()
             return True
-        else:
-            self.set_future_node()
         return False
 
-    def _check_passage(self) -> bool:
+    def _cross_map(self) -> bool:
         """Method checks if character is about to pass the map from the one side to the another."""
         if self.current_node.type == NodeType.BRIDGE:
             if not self._on_bridge:
-                self.set_current_node()
-                self.set_future_node()
                 self._on_bridge = True
+                return True
+            return False
         else:
             self._on_bridge = False
-        return self._on_bridge
+            return False
+
+    def _move_position(self) -> None:
+        """Moves the x and y coordinates."""
+        self._x, self._y = (
+            i + j * self._moving_speed for i, j in zip(
+                (self._x, self._y), utils.DIRECTIONS_COORDINATES_DIFFERENCE.value[self._moving_direction]
+            )
+        )
+        return None
 
     def move(self) -> None:
         """Moves the character."""
+        if self.is_on_intersection() and not self._on_intersection:
+            self._on_intersection = True
+            self.intersection()
+
         if self.moving:
-            self._x, self._y = (
-                i + j * self._moving_speed for i, j in zip(
-                    (self._x, self._y), utils.DIRECTIONS_COORDINATES_DIFFERENCE.value[self._moving_direction]
-                )
-            )
-            self._check_current_node()
-            self._check_passage()
+            if self._cross_map():
+                self.set_current_node()
+                self.set_future_node()
+            else:
+                self._move_position()
+                if self.check_current_node():
+                    self.set_current_node()
+                    self.set_future_node()
         return None
 
     def update(self, *args: Any, **kwargs: Any) -> None:

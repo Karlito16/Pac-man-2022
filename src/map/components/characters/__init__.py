@@ -6,6 +6,7 @@
 from .character import Character
 from .character_type import CharacterType
 from .enemies import Enemies
+from .enemy_type import EnemyType
 from .pacman import Pacman
 
 
@@ -13,5 +14,6 @@ __all__ = (
     "Character",
     "CharacterType",
     "Enemies",
+    "EnemyType",
     "Pacman"
 )
