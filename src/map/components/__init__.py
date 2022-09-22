@@ -3,6 +3,7 @@
 # author: Karlo Dimjašević
 
 
+from .characters import *
 from .elementary import grid, map_particles, nodes
 from .food import *
 from .enemy_box import EnemyBox

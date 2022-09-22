@@ -122,6 +122,7 @@ class Nodes(dict):
             MapParticles.Node.connect(
                 particle_1=args[node_index],
                 particle_2=args[node_index + 1],
-                direction=direction
+                direction=direction,
+                distance=1
             )
         return True

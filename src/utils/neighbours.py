@@ -7,13 +7,47 @@ from __future__ import annotations
 
 import src.utils as utils
 
-from typing import TYPE_CHECKING
+from typing import Generator, Iterable, TYPE_CHECKING
 if TYPE_CHECKING:
     from .particle import Particle
 
 
 class Neighbours(dict):
     """Neighbours class."""
+
+    class Neighbour(object):
+        """Neighbour class."""
+
+        def __init__(self, node: Particle, distance: float):
+            self._node = node
+            self._distance = distance
+
+        @property
+        def node(self) -> Particle:
+            """Getter."""
+            return self._node
+
+        @property
+        def distance(self) -> float:
+            """Getter."""
+            return self._distance
+
+        @distance.setter
+        def distance(self, other: float) -> None:
+            """Setter."""
+            self._distance = other
+
+        def __str__(self):
+            """To string."""
+            return f"Neighbour(node:{self.node}, distance: {self.distance})"
+
+        def __repr__(self):
+            """Repr."""
+            return self.__str__()
+
+        def __lt__(self, other: Neighbours.Neighbour) -> bool:
+            """Returns the closest neighbour."""
+            return self.distance < other.distance
 
     def __init__(self):
         """Constructor."""
@@ -32,19 +66,41 @@ class Neighbours(dict):
         """Representational method."""
         return self.__str__()
 
-    def add_new(self, direction: utils.Directions, neighbour: Particle) -> bool:
+    def add_new(self, direction: utils.Directions, neighbour: Particle, distance: float) -> bool:
         """
         Adds a new neighbour to the given side.
         Side must be integer in range [0, 3] (Direction enum!).
         :param direction:
         :param neighbour:
+        :param distance:
         :return:
         """
         if direction != utils.Directions.UNDEFINED:
-            self[direction] = neighbour
+            self[direction] = Neighbours.Neighbour(node=neighbour, distance=distance)
             return True
         return False
 
-    def get(self, direction: utils.Directions) -> __class__:
+    def get(self, direction: utils.Directions) -> Particle | None:
+        """Returns the neighbour node on the given direction."""
+        neighbour = self[direction]
+        if neighbour:
+            return neighbour.node
+        return None
+
+    def get_with_distance(self, direction: utils.Directions) -> Neighbours.Neighbour | None:
         """Returns the neighbour on the given direction."""
         return self[direction]
+
+    def get_all(self) -> Iterable[Particle]:
+        """Returns all neighbours's node."""
+        return (neighbour.node for neighbour in self.values())
+
+    def get_all_with_distance(self) -> Iterable[Particle]:
+        """Returns all neighbours."""
+        return list(self.values())
+
+    def get_all_existing(self) -> Generator[Particle]:
+        """Returns all the existing neighbours."""
+        for neighbour in self.get_all():
+            if neighbour is not None:
+                yield neighbour

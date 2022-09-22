@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from src.map.components.elementary import MapParticles
 from src.map.components.elementary import Nodes
-from src.map.components.characters import Pacman
 import src.map.components as components
 from .map_parser import MapParser
 import src.utils as utils
@@ -34,15 +33,23 @@ class Map(pygame.Surface):
         self.rect.midtop = (utils.WIN_WIDTH.value // 2, utils.WIN_HEIGHT.value * utils.MAP_MARGIN_TOP_PERCENTAGE.value)
 
         self._walls = components.Walls(grid_slots_wall=grid_slots_wall)
+        self._enemy_box = components.EnemyBox(enemy_in_nodes=self._nodes.get_all_by_type(components.elementary.NodeType.ENEMY_IN))
         self._food = components.FoodGroup(
             food_nodes=nodes.get_all_by_type(
                 components.elementary.NodeType.REGULAR,
                 components.elementary.NodeType.SUPER
             )
         )
-        self._passages = components.Passages(passage_nodes=self._nodes.get_all_by_type(components.elementary.NodeType.PASSAGE))
-        self._pacman = Pacman(starting_node=next(self._nodes.get_all_by_type(components.elementary.NodeType.PACMAN)))
+        self._passages = components.Passages(
+            passage_nodes=self._nodes.get_all_by_type(components.elementary.NodeType.PASSAGE),
+            all_nodes=self._nodes
+        )
+        self._pacman = components.Pacman(starting_node=next(self._nodes.get_all_by_type(components.elementary.NodeType.PACMAN)))
         self._pacman_group = pygame.sprite.GroupSingle(self._pacman)
+        self._enemies = components.Enemies(
+            enemy_out_node=next(self._nodes.get_all_by_type(components.elementary.NodeType.ENEMY_OUT)),
+            enemy_box=self._enemy_box
+        )
 
     @property
     def name(self) -> str:
@@ -65,6 +72,11 @@ class Map(pygame.Surface):
         return self._walls
 
     @property
+    def enemy_box(self) -> components.EnemyBox:
+        """Getter."""
+        return self._enemy_box
+
+    @property
     def food(self) -> components.FoodGroup:
         """Getter."""
         return self._food
@@ -75,24 +87,26 @@ class Map(pygame.Surface):
         return self._passages
 
     @property
-    def pacman(self) -> Pacman:
+    def pacman(self) -> components.Pacman:
         """Getter."""
         return self._pacman
 
     @property
-    def pacman_group(self):
+    def pacman_group(self) -> pygame.sprite.GroupSingle:
         """Getter."""
         return self._pacman_group
 
+    @property
+    def enemies(self) -> components.Enemies:
+        """Getter."""
+        return self._enemies
+
     def update(self) -> None:
         """Updates the map."""
-        # check collides
-        # if pygame.sprite.spritecollideany(sprite=self.pacman, group=self.walls):
-        #     self.pacman.moving = False
-
         # update
         self.food.update()
         self.pacman_group.update()
+        self.enemies.update()
         return None
 
     def draw(self, surface: pygame.Surface) -> None:
@@ -101,6 +115,7 @@ class Map(pygame.Surface):
         self.walls.draw(surface=self)
         self.food.draw(surface=self)
         self.pacman_group.draw(surface=self)
+        self.enemies.draw(surface=self)
 
         surface.blit(self, self.rect)
         return None

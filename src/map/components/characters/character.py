@@ -21,11 +21,11 @@ if TYPE_CHECKING:
 class Character(pygame.sprite.Sprite, ABC):
     """Character class."""
 
-    def __init__(self, starting_node: MapParticles.BigNode, character_type: CharacterType, moving_speed: float):
+    def __init__(self, starting_node: MapParticles.BigNode, character_type: CharacterType, moving_speed_percentage: float):
         """Construcotr."""
         self._starting_node = starting_node
         self._character_type = character_type
-        self._moving_speed = moving_speed
+        self._moving_speed = self._starting_node.size * moving_speed_percentage
         super().__init__()
 
         self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
@@ -102,10 +102,12 @@ class Character(pygame.sprite.Sprite, ABC):
     def _check_current_node(self) -> bool:
         """Method checks if character is still over the current node, or not."""
         check_func = lambda c1, c2: abs(c1 - c2) <= self._future_node.size * utils.CHARACTER_CHECKING_POSITION_AXES_THRESHOLD.value
-        if all(check_func(c1=cord_1, c2=cord_2) for cord_1, cord_2 in zip(self.position, self._future_node.pos_xy)):
+        if self._future_node and all(check_func(c1=cord_1, c2=cord_2) for cord_1, cord_2 in zip(self.position, self._future_node.pos_xy)):
             self.set_current_node()
             self.set_future_node()
             return True
+        else:
+            self.set_future_node()
         return False
 
     def _check_passage(self) -> bool:
@@ -121,20 +123,20 @@ class Character(pygame.sprite.Sprite, ABC):
 
     def move(self) -> None:
         """Moves the character."""
-        self._x, self._y = (
-            i + j * self._moving_speed for i, j in zip(
-                (self._x, self._y), utils.DIRECTIONS_COORDINATES_DIFFERENCE.value[self._moving_direction]
+        if self.moving:
+            self._x, self._y = (
+                i + j * self._moving_speed for i, j in zip(
+                    (self._x, self._y), utils.DIRECTIONS_COORDINATES_DIFFERENCE.value[self._moving_direction]
+                )
             )
-        )
-        self._check_current_node()
-        self._check_passage()
+            self._check_current_node()
+            self._check_passage()
         return None
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Method updates food object."""
         # movement
-        if self.moving:
-            self.move()
+        self.move()
 
         # animations
         self._moving_animation.update()

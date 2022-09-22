@@ -18,8 +18,11 @@ class Pacman(Character):
 
     def __init__(self, starting_node):
         """Constructor."""
-        moving_speed = starting_node.size * utils.CHARACTER_MOVING_SPEED_PERCENTAGE.value
-        super().__init__(starting_node=starting_node, character_type=CharacterType.PACMAN, moving_speed=moving_speed)
+        super().__init__(
+            starting_node=starting_node,
+            character_type=CharacterType.PACMAN,
+            moving_speed_percentage=utils.CHARACTER_MOVING_SPEED_PERCENTAGE.value
+        )
         self._future_big_node = None
         self._future_moving_direction = utils.Directions.UNDEFINED
 

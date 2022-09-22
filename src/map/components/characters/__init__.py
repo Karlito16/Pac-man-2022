@@ -5,13 +5,13 @@
 
 from .character import Character
 from .character_type import CharacterType
-# from .enemy import Enemy
+from .enemies import Enemies
 from .pacman import Pacman
 
 
 __all__ = (
     "Character",
     "CharacterType",
-    # "Enemy",
+    "Enemies",
     "Pacman"
 )

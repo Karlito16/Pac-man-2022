@@ -121,22 +121,28 @@ class Grid(dict):
             return True
         return False
 
-    def _create_node(self, i: int, j: int, type_: NodeType, class_: Callable) -> MapParticles.Node | MapParticles.BigNode:
+    def _create_node(self, i: int, j: int, type_: NodeType, big_nodes: tuple[MapParticles.BigNode, MapParticles.BigNode] | None, class_: Callable) -> MapParticles.Node | MapParticles.BigNode:
         """Wrapper method for creating a node/big node."""
         node = self._nodes.get_node(i=i, j=j)
         if not node:
-            node = class_(i=i, j=j, size=utils.MAP_GRID_SLOT_NODE_SIZE_RELATION.value * self._grid_slot_size, type_=type_)
+            node = class_(
+                i=i,
+                j=j,
+                size=utils.MAP_GRID_SLOT_NODE_SIZE_RELATION.value * self._grid_slot_size,
+                type_=type_,
+                big_nodes=big_nodes
+            )
             self.define_grid_slots_for_node(node=node)
             self._nodes.add_node(node=node)
         return node
 
-    def create_node(self, i: int, j: int, type_: NodeType) -> MapParticles.Node:
+    def create_node(self, i: int, j: int, type_: NodeType, big_nodes: tuple[MapParticles.BigNode, MapParticles.BigNode] | None) -> MapParticles.Node:
         """Converts grid slots into a node."""
-        return self._create_node(i=i, j=j, type_=type_, class_=MapParticles.Node)
+        return self._create_node(i=i, j=j, type_=type_, big_nodes=big_nodes, class_=MapParticles.Node)
 
     def create_big_node(self, i: int, j: int, type_: NodeType) -> MapParticles.BigNode:
         """Converts grid slots into a big node."""
-        return self._create_node(i=i, j=j, type_=type_, class_=MapParticles.BigNode)
+        return self._create_node(i=i, j=j, type_=type_, big_nodes=None, class_=MapParticles.BigNode)
 
     @staticmethod
     def _get_sub_nodes_type(from_node_type: NodeType, to_node_type: NodeType) -> NodeType:
@@ -176,7 +182,8 @@ class Grid(dict):
                 node = self.create_node(
                     i=start_i + node_index * diff_i,
                     j=start_j + node_index * diff_j,
-                    type_=sub_nodes_type
+                    type_=sub_nodes_type,
+                    big_nodes=(from_node, to_node)
                 )
                 yield node
         return None

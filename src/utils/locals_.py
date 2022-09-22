@@ -46,8 +46,9 @@ MAP_NODE_SIZE = PacmanConstant(28)    # px
 MAP_GRID_SLOT_SIZE = PacmanConstant(MAP_NODE_SIZE.value // MAP_GRID_SLOT_NODE_SIZE_RELATION.value)    # px
 assert MAP_NODE_SIZE.value % MAP_GRID_SLOT_SIZE.value == 0, "map node size must be exactly 2 time bigger than grid slot size"
 MAP_NEIGHBOURS_DIRECTIONS_VALUES = PacmanConstant([2, 1, -2, -1])
-MAP_WALL_SIZE = PacmanConstant(9)   # keep this value odd!
-MAP_WALL_COLOR = PacmanConstant("#010759")
+MAP_WALL_SIZE = PacmanConstant(5)   # keep this value odd!
+MAP_WALL_INSIDE_COLOR = PacmanConstant("#0a0a0a")
+MAP_WALL_BORDER_COLOR = PacmanConstant("#010759")
 MAP_WALL_RADIUS = PacmanConstant(1)
 MAP_MARGIN_TOP_PERCENTAGE = PacmanConstant(0.2)     # 20% of the total win height
 MAP_MARGIN_BOTTOM_PERCENTAGE = PacmanConstant(0.1)     # 10% of the total win height
@@ -67,9 +68,9 @@ MINIMAL_REQUIRED_ANIMATION_IMAGES = PacmanConstant(2)
 
 # FOOD
 FOOD_FLASH_ANIMATION_RANDOM_START_RANGE = PacmanConstant([0, 1000])   # miliseconds
-FOOD_FLASH_ANIMATION_INTERVAL = PacmanConstant(100)    # miliseconds
-FOOD_FLASH_ANIMATION_SPEED = PacmanConstant(0.2)
-FOOD_PERCENTAGE_OF_FLASHING_OBJECTS_AT_ONCE = PacmanConstant(0.50)   # 50% randomly selected food object will do flash at one animation cycle
+FOOD_FLASH_ANIMATION_INTERVAL = PacmanConstant(250)    # miliseconds
+FOOD_FLASH_ANIMATION_SPEED = PacmanConstant(0.1)
+FOOD_PERCENTAGE_OF_FLASHING_OBJECTS_AT_ONCE = PacmanConstant(0.05)   # 50% randomly selected food object will do flash at one animation cycle
 FOOD_COLLECTING_ANIMATION_MAX_SIZE_PERCENTAGE = PacmanConstant(1.5)
 FOOD_COLLECTING_ANIMATION_SPEED = PacmanConstant(0.075)
 FOOD_FADE_ANIMATION_SPEED = PacmanConstant(6)
@@ -88,7 +89,10 @@ assert CHARACTER_MOVING_SPEED_PERCENTAGE.value > CHARACTER_CHECKING_POSITION_AXE
     "Checking position axes threshold percentage must be lower than moving speed percentage!"
 CHARACTER_MOVING_ANIMATION_SPEED = PacmanConstant(0.2)
 CHARACTER_MOVING_KEYS = PacmanConstant([pygame.K_UP, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT])
-CHARACTER_LOOK_FOR_BIG_NODE_TRESHOLD = PacmanConstant(3)   # must be maximum 4 nodes distanced from the big node in order to apply direction change
+CHARACTER_LOOK_FOR_BIG_NODE_TRESHOLD = PacmanConstant(2)   # must be maximum n nodes distanced from the big node in order to apply direction change
+CHARACTER_ENEMY_NAMES = PacmanConstant(["Name1", "Name2", "Name3", "Name4"])
+CHARACTER_NUM_OF_ENEMIES = PacmanConstant(len(CHARACTER_ENEMY_NAMES.value))
+CHARACTER_ENEMY_START_MOVING_INTERVAL = PacmanConstant(2000)    # miliseconds
 
 # OTHER
 COLORS_ALPHA_MIN = PacmanConstant(255)

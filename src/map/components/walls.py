@@ -23,13 +23,14 @@ class Walls(pygame.sprite.Group):
             utils.Directions.LEFT: (lambda rect: (rect.topleft, rect.bottomleft))
         }
 
-        def __init__(self, grid_slot: MapParticles.GridSlot, wall_size: int, wall_color: str, wall_radius: int):
+        def __init__(self, grid_slot: MapParticles.GridSlot, wall_size: int, wall_inside_color: str, wall_border_color: str, wall_radius: int):
             """
             Constructor.
             """
             self._grid_slot = grid_slot
             self._wall_size = wall_size
-            self._wall_color = wall_color
+            self._wall_inside_color = wall_inside_color
+            self._wall_border_color = wall_border_color
             self._wall_radius = wall_radius
             super().__init__()
             self.image, self.rect = self._init_wall()
@@ -49,9 +50,14 @@ class Walls(pygame.sprite.Group):
             return self._wall_size
 
         @property
-        def wall_color(self) -> str:
+        def wall_inside_olor(self) -> str:
             """Getter."""
-            return self._wall_color
+            return self._wall_inside_color
+
+        @property
+        def wall_border_color(self) -> str:
+            """Getter."""
+            return self._wall_border_color
 
         @property
         def wall_radius(self) -> int:
@@ -61,14 +67,15 @@ class Walls(pygame.sprite.Group):
         def _init_wall(self) -> tuple[pygame.Surface, pygame.Rect]:
             """Inits the wall surface."""
             surface = pygame.Surface((self._grid_slot.size, self._grid_slot.size))
+            surface.fill(self.wall_inside_olor)
             rect = surface.get_rect()
             rect.inflate_ip(-1, -1)
             for direction in (direction for direction in utils.Directions if direction != utils.Directions.UNDEFINED):
                 neighbour = self._grid_slot.neighbours.get(direction=direction)
-                if not neighbour or neighbour.is_path():
+                if (not neighbour and direction in (utils.Directions.TOP, utils.Directions.BOTTOM)) or (neighbour and neighbour.is_path()):
                     pygame.draw.line(
                         surface,
-                        self.wall_color,
+                        self.wall_border_color,
                         *Walls.Wall._DIRECTION_LINE_POINTS_DICT[direction](rect=rect),
                         width=self.wall_size
                     )
@@ -88,6 +95,7 @@ class Walls(pygame.sprite.Group):
             self.add(Walls.Wall(
                 grid_slot=grid_slot,
                 wall_size=utils.MAP_WALL_SIZE.value,
-                wall_color=utils.MAP_WALL_COLOR.value,
+                wall_inside_color=utils.MAP_WALL_INSIDE_COLOR.value,
+                wall_border_color=utils.MAP_WALL_BORDER_COLOR.value,
                 wall_radius=utils.MAP_WALL_RADIUS.value
             ))

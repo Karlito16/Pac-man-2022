@@ -56,13 +56,13 @@ class Particle(object):
             return math.sqrt(math.pow(self.i - other.i, 2) + math.pow(self.j - other.j, 2))
         return None
 
-    def __del__(self) -> None:
-        """Destructor method."""
-        del self._i
-        del self._j
-        del self._type
-        del self._neighbours
-        return None
+    # def __del__(self) -> None:
+    #     """Destructor method."""
+    #     del self._i
+    #     del self._j
+    #     del self._type
+    #     del self._neighbours
+    #     return None
 
     @property
     def i(self) -> int:
@@ -100,11 +100,12 @@ class Particle(object):
         """Getter."""
         return self._neighbours
 
-    def add_neighbour(self, neighbour: Particle, direction: Directions = None) -> bool:
+    def add_neighbour(self, neighbour: Particle, direction: Directions = None, distance: float = None) -> bool:
         """Syntatic sugar method."""
         if isinstance(neighbour, Particle):
             direction = Particle.get_direction(particle1=self, particle2=neighbour) if direction is None else direction
-            return self._neighbours.add_new(direction=direction, neighbour=neighbour)
+            distance = distance if distance is not None else abs(self - neighbour)
+            return self._neighbours.add_new(direction=direction, neighbour=neighbour, distance=distance)
         return False
 
     @classmethod
@@ -121,15 +122,16 @@ class Particle(object):
         return Directions.UNDEFINED
 
     @classmethod
-    def connect(cls, particle_1: Particle, particle_2: Particle, direction: Directions = None) -> bool:
+    def connect(cls, particle_1: Particle, particle_2: Particle, direction: Directions = None, distance: float = None) -> bool:
         """Connects the two particles."""
         direction = direction if direction is not None else Particle.get_direction(
             particle1=particle_1,
             particle2=particle_2
         )
+        distance = distance if distance is not None else abs(particle_1 - particle_2)
         if isinstance(particle_1, cls) and isinstance(particle_2, cls) and \
                 (isinstance(particle_1, particle_2.__class__) or isinstance(particle_2, particle_1.__class__)):
-            particle_1.add_neighbour(direction=direction, neighbour=particle_2)
-            particle_2.add_neighbour(direction=Directions.get_opposite(direction=direction), neighbour=particle_1)
+            particle_1.add_neighbour(direction=direction, neighbour=particle_2, distance=distance)
+            particle_2.add_neighbour(direction=Directions.get_opposite(direction=direction), neighbour=particle_1, distance=distance)
             return True
         return False
