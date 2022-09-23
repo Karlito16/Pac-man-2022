@@ -35,14 +35,15 @@ class Character(pygame.sprite.Sprite, ABC):
         self._moving, self._future_node = None, None
         self.set_future_node()
         self._on_bridge = False
+        self._stopped = False
         self._x, self._y = self._starting_node.pos_xy
         self._relevant_size = self._starting_node.size * utils.CHARACTER_RELEVANT_SIZE_PERCENTAGE.value
 
         # imports the assets for walking and for dying
-        for side_name in [key.name.lower() for key in utils.Directions if key != utils.Directions.UNDEFINED] + ["death"]:
+        for side_name, attr_name in utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value.items():
             utils.import_assets(
                 instance=self,
-                attr_name=f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{side_name}",
+                attr_name=attr_name,
                 directory=f"{utils.CHARACHERS_DIR.value}\\{self._character_type.name}",
                 relevant_size=self._relevant_size,
                 directory_constraints=[side_name],
@@ -60,7 +61,7 @@ class Character(pygame.sprite.Sprite, ABC):
 
     @moving_direction.setter
     def moving_direction(self, other: utils.Directions) -> None:
-        if other != utils.Directions.UNDEFINED and self.current_node.type != NodeType.BRIDGE:
+        if other != utils.Directions.UNDEFINED and self.current_node.type != NodeType.BRIDGE and not self._stopped:
             self._moving_direction = other
             self.set_future_node()
 
@@ -134,6 +135,19 @@ class Character(pygame.sprite.Sprite, ABC):
             return True
         return False
 
+    @property
+    def stopped(self) -> bool:
+        """Getter."""
+        return self._stopped
+
+    def stop(self) -> None:
+        """Stops the character. Moving and direction changes are disabled."""
+        self._stopped = True
+
+    def release(self) -> None:
+        """Contrary from stop method."""
+        self._stopped = False
+
     def _cross_map(self) -> bool:
         """Method checks if character is about to pass the map from the one side to the another."""
         if self.current_node.type == NodeType.BRIDGE:
@@ -171,10 +185,16 @@ class Character(pygame.sprite.Sprite, ABC):
                     self.set_future_node()
         return None
 
+    @abstractmethod
+    def die(self) -> None:
+        """Method is called when character dyes."""
+
+
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Method updates food object."""
         # movement
-        self.move()
+        if not self._stopped:
+            self.move()
 
         # animations
         self._moving_animation.update()

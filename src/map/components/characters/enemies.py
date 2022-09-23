@@ -12,7 +12,7 @@ from ..elementary import MapParticles, NodeType
 import src.utils as utils
 import src.utils.path as path
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator
 import pygame
 import random
 
@@ -123,6 +123,9 @@ class Enemies(pygame.sprite.Group):
                 super().move()
             return None
 
+        def die(self) -> None:
+            pass
+
     def __init__(self, enemy_out_node: MapParticles.BigNode, enemy_box: EnemyBox):
         """Contructor."""
         self._enemy_out_node = enemy_out_node
@@ -138,15 +141,10 @@ class Enemies(pygame.sprite.Group):
             loops=utils.CHARACTER_NUM_OF_ENEMIES.value
         )
 
-    def __iter__(self) -> None:
-        """Iter."""
-        self._index = 0
-        return None
-
     def __next__(self) -> pygame.sprite.Sprite:
         """Next."""
         if not hasattr(self, "_index"):
-            self.__iter__()
+            self._index = 0
         if self._index >= len(self):
             raise StopIteration()
         ret_val = self.sprites()[self._index]
@@ -167,4 +165,10 @@ class Enemies(pygame.sprite.Group):
         """Unleashes the one enemy, triggered by a timer."""
         enemy = next(self)
         enemy.unleash()
+        return None
+
+    def stop_all(self) -> None:
+        """Stops the enemies."""
+        for enemy in self.sprites():
+            enemy.stop()
         return None

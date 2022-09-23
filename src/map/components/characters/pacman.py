@@ -9,6 +9,7 @@ from .character import Character
 from .character_type import CharacterType
 from src.map.components.elementary import MapParticles
 import src.utils as utils
+import src.utils.animations as animations
 
 from typing import Any
 
@@ -25,6 +26,8 @@ class Pacman(Character):
         )
         self._future_big_node = None
         self._future_moving_direction = utils.Directions.UNDEFINED
+
+        # self._dying_animation = animations.
 
     def has_future_move(self) -> bool:
         """Method returns if character is about to change it's direction."""
@@ -78,3 +81,6 @@ class Pacman(Character):
         """Eating."""
         if hasattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value):
             score = getattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value)()
+
+    def die(self) -> None:
+        pass

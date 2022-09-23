@@ -3,12 +3,12 @@
 # author: Karlo Dimjašević
 
 
+from .constants import *
 from .counters import *
 from .assets import *
 from .custom_events import CustomEvents
 from .directions import Directions
 from .game import Game
-from .locals_ import *
 from .neighbours import Neighbours
 from .particle import Particle
 from .particle_container import ParticleContainer

@@ -22,6 +22,7 @@ class Game(ABC):
         """
         self._screen = screen
         self._clock = clock
+        self._game_running = False
 
     @property
     def screen(self) -> pygame.Surface:
@@ -32,6 +33,16 @@ class Game(ABC):
     def clock(self) -> pygame.time.Clock:
         """Returns the clock attribute."""
         return self._clock
+
+    @property
+    def game_running(self) -> bool:
+        """Getter."""
+        return self._game_running
+
+    @game_running.setter
+    def game_running(self, other: bool) -> None:
+        """Setter."""
+        self._game_running = other
 
     @abstractmethod
     def mainloop(self) -> None:
