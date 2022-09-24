@@ -40,6 +40,7 @@ class Counter(object):
         self._counting = False
         self._done = False
         self._paused = False
+        self._finish = False
 
         self._pow_n_func = lambda x: round(x * self._count_speed_power, self._round_on)
         self._root_n_func = lambda x: round(x / self._count_speed_power, self._round_on)
@@ -61,6 +62,7 @@ class Counter(object):
         self._counting = True
         self._done = False
         self._paused = False
+        self._finish = False
         return None
 
     def start(self) -> None:
@@ -89,6 +91,11 @@ class Counter(object):
         self._counting = False
         return None
 
+    def finish(self) -> None:
+        """Setter."""
+        self._finish = True
+        return None
+
     def _count_repeat_condition(self) -> bool:
         """Count repeat condition."""
         return self._current_repeat <= self._count_repeat or self._count_repeat == -1
@@ -113,7 +120,7 @@ class Counter(object):
             next_count = self._count_next()
             if next_count is None:  # resolve function
                 self._current_repeat += 1
-                self._counting = self._count_repeat_condition()
+                self._counting = self._count_repeat_condition() and not self._finish
                 self._resolve_function()
                 if self.counting:
                     self._repeat()

@@ -118,7 +118,8 @@ class Map(pygame.Surface):
         self.fill(utils.MAP_BACKGROUND_COLOR.value)
         self.walls.draw(surface=self)
         self.food.draw(surface=self)
-        self.pacman_group.draw(surface=self)
+        if not self.pacman.hidden:
+            self.pacman_group.draw(surface=self)
         self.enemies.draw(surface=self)
 
         surface.blit(self, self.rect)

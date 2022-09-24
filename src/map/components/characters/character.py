@@ -28,17 +28,7 @@ class Character(pygame.sprite.Sprite, ABC):
         self._moving_speed = self._starting_node.size * moving_speed_percentage
         super().__init__()
 
-        self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
-        self._on_intersection = False
-        self._previous_node = None
-        self._current_node = self._starting_node
-        self._moving, self._future_node = None, None
-        self.set_future_node()
-        self._on_bridge = False
-        self._stopped = False
-        self._x, self._y = self._starting_node.pos_xy
         self._relevant_size = self._starting_node.size * utils.CHARACTER_RELEVANT_SIZE_PERCENTAGE.value
-
         # imports the assets for walking and for dying
         for side_name, attr_name in utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value.items():
             utils.import_assets(
@@ -50,9 +40,25 @@ class Character(pygame.sprite.Sprite, ABC):
                 wshadow=True
             )
 
+        self._reinit()
+
         # animations
         self._moving_animation = animations.MovingAnimation(instance=self)
         self._moving_animation.start()
+
+    def _reinit(self) -> None:
+        """Reinits the character, usually after respawning."""
+        self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
+        self._on_intersection = False
+        self._previous_node = None
+        self._current_node = self._starting_node
+        self._moving, self._future_node = None, None
+        self.set_future_node()
+        self._on_bridge = False
+        self._freezed = False
+        self._hidden = False
+        self._x, self._y = self._starting_node.pos_xy
+        return None
 
     @property
     def moving_direction(self) -> utils.Directions:
@@ -61,7 +67,7 @@ class Character(pygame.sprite.Sprite, ABC):
 
     @moving_direction.setter
     def moving_direction(self, other: utils.Directions) -> None:
-        if other != utils.Directions.UNDEFINED and self.current_node.type != NodeType.BRIDGE and not self._stopped:
+        if other != utils.Directions.UNDEFINED and self.current_node.type != NodeType.BRIDGE and not self._freezed:
             self._moving_direction = other
             self.set_future_node()
 
@@ -110,9 +116,41 @@ class Character(pygame.sprite.Sprite, ABC):
         return self._future_node
 
     @property
+    def freezed(self) -> bool:
+        """Getter."""
+        return self._freezed
+
+    @freezed.setter
+    def freezed(self, other: bool) -> None:
+        """
+        Freezes the character.
+        Moving and direction changes are disabled.
+        Moving animations will be finished.
+        """
+        self._freezed = other
+        if self._freezed:
+            self._moving_animation.finish()
+
+    @property
+    def hidden(self) -> bool:
+        """Getter."""
+        return self._hidden
+
+    @hidden.setter
+    def hidden(self, other: bool) -> None:
+        """Setter."""
+        self._hidden = other
+
+    @property
     def current_animation_assets_attr_name(self) -> str:
         """Returns the attribute name."""
         return f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
+
+    def respawn(self) -> None:
+        """Respawns the character."""
+        self._reinit()
+        self._moving_animation.start()
+        return None
 
     def set_current_node(self) -> None:
         """Setter. Syntatic sugar method."""
@@ -134,19 +172,6 @@ class Character(pygame.sprite.Sprite, ABC):
         if self._future_node and all(check_func(c1=cord_1, c2=cord_2) for cord_1, cord_2 in zip(self.position, self._future_node.pos_xy)):
             return True
         return False
-
-    @property
-    def stopped(self) -> bool:
-        """Getter."""
-        return self._stopped
-
-    def stop(self) -> None:
-        """Stops the character. Moving and direction changes are disabled."""
-        self._stopped = True
-
-    def release(self) -> None:
-        """Contrary from stop method."""
-        self._stopped = False
 
     def _cross_map(self) -> bool:
         """Method checks if character is about to pass the map from the one side to the another."""
@@ -186,14 +211,14 @@ class Character(pygame.sprite.Sprite, ABC):
         return None
 
     @abstractmethod
-    def die(self) -> None:
+    def die(self, *args, **kwargs) -> None:
         """Method is called when character dyes."""
-
+        pass
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Method updates food object."""
         # movement
-        if not self._stopped:
+        if not self._freezed:
             self.move()
 
         # animations

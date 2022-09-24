@@ -66,6 +66,11 @@ class Animation(ABC):
         self._animation.end()
         return None
 
+    def finish(self) -> None:
+        """Finishes the animation."""
+        self._animation.finish()
+        return None
+
     def _next(self) -> None:
         """Next iteration."""
         self._animation.next()

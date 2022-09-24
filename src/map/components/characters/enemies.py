@@ -12,7 +12,7 @@ from ..elementary import MapParticles, NodeType
 import src.utils as utils
 import src.utils.path as path
 
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, List
 import pygame
 import random
 
@@ -35,6 +35,11 @@ class Enemies(pygame.sprite.Group):
                 character_type=CharacterType.ENEMY,
                 moving_speed_percentage=utils.CHARACTER_MOVING_SPEED_PERCENTAGE.value
             )
+            self._reinit()
+
+        def _reinit(self) -> None:
+            """Overrides in Characters."""
+            super()._reinit()
             self.moving = False
             self.moving_direction = utils.Directions.UNDEFINED
             self._moving_path = list()
@@ -123,7 +128,7 @@ class Enemies(pygame.sprite.Group):
                 super().move()
             return None
 
-        def die(self) -> None:
+        def die(self, *args, **kwargs) -> None:
             pass
 
     def __init__(self, enemy_out_node: MapParticles.BigNode, enemy_box: EnemyBox):
@@ -131,23 +136,32 @@ class Enemies(pygame.sprite.Group):
         self._enemy_out_node = enemy_out_node
         self._enemy_box = enemy_box
         super().__init__()
+        self._enemies_ordered = list()
 
         for starting_node, enemy_type in zip([self._enemy_out_node] + self._enemy_box, [EnemyType.SHADOW, EnemyType.POKEY, EnemyType.SPEEDY, EnemyType.BASHFUL]):
-            self.add(Enemies.Enemy(starting_node=starting_node, enemy_out_node=self._enemy_out_node, type_=enemy_type))
+            enemy = Enemies.Enemy(starting_node=starting_node, enemy_out_node=self._enemy_out_node, type_=enemy_type)
+            self._enemies_ordered.append(enemy)
+            self.add(enemy)
 
-        utils.CustomEvents.new(
+        self._reinit()
+
+    def _reinit(self) -> None:
+        """Reinit method. Usually called when respawning all the enemies."""
+        self._index = 0
+        if hasattr(self, "_unleashing_event"):
+            utils.CustomEvents.delete(event=self._unleashing_event)
+        self._unleashing_event = utils.CustomEvents.new(
             interval=utils.CHARACTER_ENEMY_START_MOVING_INTERVAL.value,
             callback_function=self._unleash,
             loops=utils.CHARACTER_NUM_OF_ENEMIES.value
         )
+        return None
 
     def __next__(self) -> pygame.sprite.Sprite:
         """Next."""
-        if not hasattr(self, "_index"):
-            self._index = 0
-        if self._index >= len(self):
-            raise StopIteration()
-        ret_val = self.sprites()[self._index]
+        if self._index >= len(self._enemies_ordered):
+            raise StopIteration
+        ret_val = self._enemies_ordered[self._index]
         self._index += 1
         return ret_val
 
@@ -164,11 +178,44 @@ class Enemies(pygame.sprite.Group):
     def _unleash(self) -> None:
         """Unleashes the one enemy, triggered by a timer."""
         enemy = next(self)
-        enemy.unleash()
+        if enemy:
+            enemy.unleash()
         return None
 
-    def stop_all(self) -> None:
+    def freeze(self) -> None:
         """Stops the enemies."""
-        for enemy in self.sprites():
-            enemy.stop()
+        for enemy in self:
+            enemy.freezed = True
         return None
+
+    def unfreeze(self) -> None:
+        for enemy in self:
+            enemy.freezed = False
+        return None
+
+    def hide_all(self) -> None:
+        """Hides all enemies."""
+        for enemy in self:
+            enemy.hidden = True
+        return None
+
+    def show_all(self) -> None:
+        """Opposite from hide_all method."""
+        for enemy in self:
+            enemy.hidden = False
+        return None
+
+    def respawn_all(self) -> None:
+        """Respawns all the enemies."""
+        for enemy in self:
+            enemy.respawn()
+        self._reinit()
+        return None
+
+    def draw(self, surface: pygame.Surface) -> List[pygame.Rect]:
+        """Overrides in SpriteGroup."""
+        temp_removed = [enemy for enemy in self if enemy.hidden]
+        self.remove(*temp_removed)
+        ret_val = super().draw(surface)
+        self.add(*temp_removed)
+        return ret_val

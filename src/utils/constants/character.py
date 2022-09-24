@@ -27,3 +27,4 @@ CHARACTER_LOOK_FOR_BIG_NODE_TRESHOLD = PacmanConstant(2)   # must be maximum n n
 CHARACTER_ENEMY_NAMES = PacmanConstant(["Name1", "Name2", "Name3", "Name4"])
 CHARACTER_NUM_OF_ENEMIES = PacmanConstant(len(CHARACTER_ENEMY_NAMES.value))
 CHARACTER_ENEMY_START_MOVING_INTERVAL = PacmanConstant(2000)    # miliseconds
+CHARACTER_DEATH_GAME_PAUSE_INTERVAL = PacmanConstant(1000)  # miliseconds

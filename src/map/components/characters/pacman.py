@@ -24,10 +24,15 @@ class Pacman(Character):
             character_type=CharacterType.PACMAN,
             moving_speed_percentage=utils.CHARACTER_MOVING_SPEED_PERCENTAGE.value
         )
+        self._reinit()
+
+    def _reinit(self) -> None:
+        """Overrides in Character."""
+        super()._reinit()
         self._future_big_node = None
         self._future_moving_direction = utils.Directions.UNDEFINED
-
-        # self._dying_animation = animations.
+        self._dying = False
+        return None
 
     def has_future_move(self) -> bool:
         """Method returns if character is about to change it's direction."""
@@ -72,15 +77,33 @@ class Pacman(Character):
             self._set_future_move()     # resets
         return None
 
-    def update(self, *args: Any, **kwargs: Any) -> None:
-        """Overrides the method from the Character class."""
-        super().update(args, kwargs)
-        self.eat()
-
     def eat(self) -> None:
         """Eating."""
         if hasattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value):
             score = getattr(self.current_node, utils.FOOD_COLLECT_FOOD_CALLBACK_ATTR_NAME.value)()
 
-    def die(self) -> None:
-        pass
+    def die(self, *args, **kwargs) -> None:
+        """Starts the pacman dying animation."""
+
+        def callback_function() -> None:
+            """Callable function after dying animation is over."""
+            self._dying = False
+            kwargs["callback_function"]()
+            return None
+
+        self._dying = True
+        if kwargs["callback_function"]:
+            self._dying_animation = animations.PacmanDyingAnimation(
+                instance=self,
+                callback_function=callback_function
+            )
+            self._dying_animation.start()
+        return None
+
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        """Overrides the method from the Character class."""
+        if self._dying:
+            self._dying_animation.update()
+        else:
+            super().update(args, kwargs)
+            self.eat()
