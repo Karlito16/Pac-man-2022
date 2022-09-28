@@ -3,9 +3,9 @@
 # author: Karlo Dimjašević
 
 
-from .game import Game
+from .app import App
 
 
 __all__ = (
-    "Game"
+    "App"
 )

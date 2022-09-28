@@ -8,7 +8,7 @@ from .counters import *
 from .assets import *
 from .custom_events import CustomEvents
 from .directions import Directions
-from .game import Game
+from .app import App
 from .neighbours import Neighbours
 from .particle import Particle
 from .particle_container import ParticleContainer
@@ -19,7 +19,7 @@ from .window import *
 __all__ = (
     "CustomEvents",
     "Directions",
-    "Game",
+    "App",
     "Neighbours",
     "Particle",
     "ParticleContainer",

@@ -128,7 +128,7 @@ class Map(pygame.Surface):
 
 def load_maps() -> Generator[Map, ]:
     """
-    Function loads the game maps.
+    Function loads the app maps.
     :return: (<class 'Map'>)
     """
     for map_name in utils.MAP_NAMES.value:
