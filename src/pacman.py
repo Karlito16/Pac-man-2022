@@ -28,7 +28,7 @@ class PacmanApp(utils.App):
 
         # screen init
         main_menu_screen = screens.MainMenuScreen()
-        game_screen = screens.GameScreen(current_map=self._maps[0])  # TODO: Temp solution for current map!
+        game_screen = screens.GameScreen(current_map=self._maps[1])  # TODO: Temp solution for current map!
         self._screen_manager = screens.ScreenManager(game_screen, main_menu_screen)
 
     @property

@@ -19,7 +19,7 @@ class ScreenManager(dict):
         """Constructor."""
         super().__init__()
         for screen in screens:
-            self[screen.name] = screens
+            self[screen.name] = screen
         self._active_screen = screens[0]
 
     @property
@@ -29,8 +29,11 @@ class ScreenManager(dict):
 
     def update_active_screen(self, window: pygame.Surface, events: list[pygame.event.Event]) -> None:
         """Update method."""
+
         # Active screen control
-        self._active_screen.update(events=events)
+        next_screen = self._active_screen.update(events=events)
+        if next_screen:
+            self._active_screen = self[next_screen]
 
         # Update main window
         window.blit(self._active_screen, self._active_screen.get_rect())

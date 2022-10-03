@@ -23,17 +23,25 @@ class FoodGroup(pygame.sprite.Group):
         """Constructor."""
         self._food_nodes = food_nodes
         super().__init__()
+        self._num_of_coins = 0
         for food_node in self._food_nodes.get_all():
             if food_node.type == NodeType.REGULAR:
                 class_ = Coin
             else:
                 class_ = SuperCoin
-            self.add(class_(node=food_node))
+            food = class_(node=food_node)
+            self._num_of_coins += 1
+            self.add(food)
 
         self._flashing_event = utils.CustomEvents.new(
             interval=utils.FOOD_FLASH_ANIMATION_INTERVAL.value,
             callback_function=self.flash_animation
         )
+
+    @property
+    def num_of_coins(self) -> int:
+        """Getter."""
+        return self._num_of_coins
 
     def _get_non_active_sprites(self) -> Generator[Food, ]:
         """Method returns all sprites that currently doesn't perform animation."""

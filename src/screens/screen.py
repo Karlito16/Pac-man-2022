@@ -3,6 +3,8 @@
 # author: Karlo Dimjašević
 
 
+from __future__ import annotations
+
 import src.utils as utils
 from abc import ABC, abstractmethod
 import pygame
@@ -22,6 +24,6 @@ class Screen(pygame.Surface, ABC):
         pass
 
     @abstractmethod
-    def update(self, events: list[pygame.event.Event]) -> None:
+    def update(self, events: list[pygame.event.Event]) -> str | None:
         """Updates the screen at singular frame."""
         pass

@@ -15,3 +15,6 @@ FPS_RATE = PacmanConstant(60)   # frames per seconds
 # SCREEN NAMES
 GAME_SCREEN = PacmanConstant("app-screen")
 MAIN_MENU_SCREEN = PacmanConstant("main-menu-screen")
+
+# SCREEN PROPS
+GAME_SCREEN_FONT_PERCENTAGE = PacmanConstant(0.6)

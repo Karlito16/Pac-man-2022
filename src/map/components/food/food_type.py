@@ -10,7 +10,7 @@ from enum import Enum, unique
 class FoodType(Enum):
     """Food type enum."""
 
-    COIN = "coin"
-    SUPER_COIN = "super_coin"
-    CHERRY = "cherry"
-    ENEMY = "enemy"
+    COIN = 50
+    SUPER_COIN = 100
+    CHERRY = 500
+    ENEMY = 200

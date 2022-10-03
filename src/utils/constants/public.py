@@ -22,5 +22,9 @@ DIRECTIONS_COORDINATES_DIFFERENCE = PacmanConstant({
 # OTHER
 COLORS_ALPHA_MIN = PacmanConstant(255)
 COLORS_ALPHA_MAX = PacmanConstant(0)
+COLORS_PACMAN = PacmanConstant("FFD800")
 
-RESUME_GAME_INTERVAL = PacmanConstant(2)
+RESUME_GAME_INTERVAL = PacmanConstant(2000)
+ENDING_GAME_INTERVAL = PacmanConstant(3000)
+
+FONT_STYLE = PacmanConstant("freesansbold.ttf")

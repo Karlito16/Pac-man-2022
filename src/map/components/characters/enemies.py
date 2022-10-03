@@ -33,7 +33,7 @@ class Enemies(pygame.sprite.Group):
             super().__init__(
                 starting_node=starting_node,
                 character_type=CharacterType.ENEMY,
-                moving_speed_percentage=utils.CHARACTER_MOVING_SPEED_PERCENTAGE.value
+                moving_speed_percentage=utils.CHARACTER_ENEMY_MOVING_SPEED_PERCENTAGE.value
             )
             self._reinit()
 
@@ -43,6 +43,8 @@ class Enemies(pygame.sprite.Group):
             self.moving = False
             self.moving_direction = utils.Directions.UNDEFINED
             self._moving_path = list()
+            self._is_food = False
+            self._dead = False
 
         @property
         def enemy_out_node(self) -> MapParticles.BigNode:
@@ -58,6 +60,23 @@ class Enemies(pygame.sprite.Group):
         def moving_path(self) -> list[MapParticles.BigNode]:
             """Returns the moving path."""
             return self._moving_path
+
+        @property
+        def dead(self) -> bool:
+            """Getter."""
+            return self._dead
+
+        @property
+        def moving_direction(self) -> utils.Directions:
+            """Getter."""
+            return super().moving_direction
+
+        @moving_direction.setter
+        def moving_direction(self, other: utils.Directions) -> None:
+            """Overrides in Character."""
+            super(Enemies.Enemy, self.__class__).moving_direction.fset(self, other)
+            if hasattr(self, "_is_food") and self._is_food:
+                self.current_animation_assets_attr_name = utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value[utils.CHARACTER_DEATH_KEYWORD.value]
 
         def _in_box(self) -> bool:
             """Returns True if enemy is in the enemy box."""
@@ -129,7 +148,32 @@ class Enemies(pygame.sprite.Group):
             return None
 
         def die(self, *args, **kwargs) -> None:
-            pass
+            """Method is called when Pacman eats the Enemy while having boost mode on."""
+            self._dead = True
+            return None
+
+        def become_food(self) -> None:
+            """Turns the enemy into a food."""
+            self._is_food = True
+            self.moving_speed_percentage = utils.CHARACTER_ENEMY_AS_FOOD_MOVING_SPEED_PERCENTAGE.value
+            self.current_animation_assets_attr_name = utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value[utils.CHARACTER_DEATH_KEYWORD.value]
+
+        def become_ordinary(self) -> None:
+            """Turns the enemy back as enemy."""
+            self._is_food = False
+            self._dead = False
+            self.moving_speed_percentage = utils.CHARACTER_ENEMY_MOVING_SPEED_PERCENTAGE.value
+            self.current_animation_assets_attr_name_by_md()
+            return None
+
+        def run_back_into_the_box(self) -> None:
+            """Method is called when Enemy gets eaten."""
+            self.respawn()
+            self.unleash()
+            self.become_ordinary()
+            self._dead = True
+            # self.become_food()  # TODO: Solve the case when enemies becomes ordinary just as this enemy runs back into the box
+            return None
 
     def __init__(self, enemy_out_node: MapParticles.BigNode, enemy_box: EnemyBox):
         """Contructor."""
@@ -183,12 +227,13 @@ class Enemies(pygame.sprite.Group):
         return None
 
     def freeze(self) -> None:
-        """Stops the enemies."""
+        """Freezes the enemies."""
         for enemy in self:
             enemy.freezed = True
         return None
 
     def unfreeze(self) -> None:
+        """Unfreezes the enemies."""
         for enemy in self:
             enemy.freezed = False
         return None
@@ -211,6 +256,16 @@ class Enemies(pygame.sprite.Group):
             enemy.respawn()
         self._reinit()
         return None
+
+    def become_food_all(self) -> None:
+        """Method is called when Pacman eats the super coin."""
+        for enemy in self:
+            enemy.become_food()
+
+    def become_ordinary_all(self) -> None:
+        """Method is called when Pacman eats the super coin."""
+        for enemy in self:
+            enemy.become_ordinary()
 
     def draw(self, surface: pygame.Surface) -> List[pygame.Rect]:
         """Overrides in SpriteGroup."""

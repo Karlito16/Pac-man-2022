@@ -55,3 +55,14 @@ def import_assets(instance: Any, attr_name: str, directory: str, relevant_size: 
     # set attribute
     setattr(instance, attr_name, list(scaled_images))
     return None
+
+
+def color_hex_to_tuple(color_hex: str) -> tuple:
+    """Converts color in hexadecimal string notation into tuple hexadecimal notation."""
+    length = len(color_hex)
+    if length != 6:
+        return 0, 0, 0
+    offset = 2
+    return tuple(
+        [int('0x' + color_hex[offset * i: offset * i + offset], 16) for i in range(length // 2)]
+    )

@@ -25,7 +25,8 @@ class Character(pygame.sprite.Sprite, ABC):
         """Construcotr."""
         self._starting_node = starting_node
         self._character_type = character_type
-        self._moving_speed = self._starting_node.size * moving_speed_percentage
+        self._moving_speed_percentage = moving_speed_percentage
+        self._moving_speed = self._starting_node.size * self._moving_speed_percentage
         super().__init__()
 
         self._relevant_size = self._starting_node.size * utils.CHARACTER_RELEVANT_SIZE_PERCENTAGE.value
@@ -49,6 +50,7 @@ class Character(pygame.sprite.Sprite, ABC):
     def _reinit(self) -> None:
         """Reinits the character, usually after respawning."""
         self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
+        self.current_animation_assets_attr_name_by_md()
         self._on_intersection = False
         self._previous_node = None
         self._current_node = self._starting_node
@@ -61,6 +63,22 @@ class Character(pygame.sprite.Sprite, ABC):
         return None
 
     @property
+    def moving_speed(self) -> float:
+        """Getter."""
+        return self._moving_speed
+
+    @property
+    def moving_speed_percentage(self) -> float:
+        """Getter."""
+        return self._moving_speed_percentage
+
+    @moving_speed_percentage.setter
+    def moving_speed_percentage(self, other: float) -> None:
+        """Setter."""
+        self._moving_speed_percentage = other
+        self._moving_speed = self._starting_node.size * self._moving_speed_percentage
+
+    @property
     def moving_direction(self) -> utils.Directions:
         """Getter."""
         return self._moving_direction
@@ -69,6 +87,7 @@ class Character(pygame.sprite.Sprite, ABC):
     def moving_direction(self, other: utils.Directions) -> None:
         if other != utils.Directions.UNDEFINED and self.current_node.type != NodeType.BRIDGE and not self._freezed:
             self._moving_direction = other
+            self._current_animation_assets_attr_name = utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value[self._moving_direction.name.lower()]
             self.set_future_node()
 
     @property
@@ -130,6 +149,8 @@ class Character(pygame.sprite.Sprite, ABC):
         self._freezed = other
         if self._freezed:
             self._moving_animation.finish()
+        else:
+            self._moving_animation.start()
 
     @property
     def hidden(self) -> bool:
@@ -144,12 +165,22 @@ class Character(pygame.sprite.Sprite, ABC):
     @property
     def current_animation_assets_attr_name(self) -> str:
         """Returns the attribute name."""
-        return f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
+        return self._current_animation_assets_attr_name
+
+    @current_animation_assets_attr_name.setter
+    def current_animation_assets_attr_name(self, other: str) -> None:
+        """Setter."""
+        self._current_animation_assets_attr_name = other
+
+    def current_animation_assets_attr_name_by_md(self) -> str:
+        """Getter and setter, uses the moving direction as the reference."""
+        self._current_animation_assets_attr_name = f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
+        return self._current_animation_assets_attr_name
 
     def respawn(self) -> None:
         """Respawns the character."""
         self._reinit()
-        self._moving_animation.start()
+        # self._moving_animation.start()
         return None
 
     def set_current_node(self) -> None:
@@ -212,7 +243,7 @@ class Character(pygame.sprite.Sprite, ABC):
 
     @abstractmethod
     def die(self, *args, **kwargs) -> None:
-        """Method is called when character dyes."""
+        """Method is called when character dies."""
         pass
 
     def update(self, *args: Any, **kwargs: Any) -> None:
