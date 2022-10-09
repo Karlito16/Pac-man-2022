@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+from copy import copy
+
 from .character_type import CharacterType
 from src.map.components.elementary import NodeType
 from abc import ABC, abstractmethod
@@ -21,8 +23,9 @@ if TYPE_CHECKING:
 class Character(pygame.sprite.Sprite, ABC):
     """Character class."""
 
-    def __init__(self, starting_node: MapParticles.BigNode, character_type: CharacterType, moving_speed_percentage: float):
+    def __init__(self, name: str, starting_node: MapParticles.BigNode, character_type: CharacterType, moving_speed_percentage: float, body_assets_dir: str):
         """Construcotr."""
+        self._name = name
         self._starting_node = starting_node
         self._character_type = character_type
         self._moving_speed_percentage = moving_speed_percentage
@@ -30,16 +33,14 @@ class Character(pygame.sprite.Sprite, ABC):
         super().__init__()
 
         self._relevant_size = self._starting_node.size * utils.CHARACTER_RELEVANT_SIZE_PERCENTAGE.value
-        # imports the assets for walking and for dying
-        for side_name, attr_name in utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value.items():
-            utils.import_assets(
-                instance=self,
-                attr_name=attr_name,
-                directory=f"{utils.CHARACHERS_DIR.value}\\{self._character_type.name}",
-                relevant_size=self._relevant_size,
-                directory_constraints=[side_name],
-                wshadow=True
-            )
+        # import character's body
+        utils.import_assets(
+            instance=self,
+            attr_name=utils.CHARACTER_BODY_ASSETS_ATTR_NAME.value,
+            directory=body_assets_dir,
+            relevant_size=self._relevant_size,
+            smoothscale=True
+        )
 
         self._reinit()
 
@@ -47,10 +48,12 @@ class Character(pygame.sprite.Sprite, ABC):
         self._moving_animation = animations.MovingAnimation(instance=self)
         self._moving_animation.start()
 
+        # body color
+        self._body_color_surface = pygame.Surface(self.image.get_size()).convert_alpha()
+
     def _reinit(self) -> None:
         """Reinits the character, usually after respawning."""
         self._moving_direction = utils.CHARACTER_DEFAULT_DIRECTION.value
-        self.current_animation_assets_attr_name_by_md()
         self._on_intersection = False
         self._previous_node = None
         self._current_node = self._starting_node
@@ -99,6 +102,11 @@ class Character(pygame.sprite.Sprite, ABC):
     def moving(self, other: bool) -> None:
         """Setter."""
         self._moving = other
+
+    @property
+    def relevant_size(self) -> float:
+        """Getter."""
+        return self._relevant_size
 
     @property
     def on_intersection(self) -> bool:
@@ -162,20 +170,11 @@ class Character(pygame.sprite.Sprite, ABC):
         """Setter."""
         self._hidden = other
 
-    @property
-    def current_animation_assets_attr_name(self) -> str:
-        """Returns the attribute name."""
-        return self._current_animation_assets_attr_name
-
-    @current_animation_assets_attr_name.setter
-    def current_animation_assets_attr_name(self, other: str) -> None:
-        """Setter."""
-        self._current_animation_assets_attr_name = other
-
-    def current_animation_assets_attr_name_by_md(self) -> str:
-        """Getter and setter, uses the moving direction as the reference."""
-        self._current_animation_assets_attr_name = f"{utils.CHARACTER_ANIMATION_ATTRIBUTE_BASE_NAME.value}{self._moving_direction.name.lower()}"
-        return self._current_animation_assets_attr_name
+    def get_character_body_assets(self) -> list[pygame.image] | None:
+        """Derived class returns a list with character's body assets."""
+        if hasattr(self, utils.CHARACTER_BODY_ASSETS_ATTR_NAME.value):
+            return getattr(self, utils.CHARACTER_BODY_ASSETS_ATTR_NAME.value)
+        return None
 
     def respawn(self) -> None:
         """Respawns the character."""
@@ -246,6 +245,12 @@ class Character(pygame.sprite.Sprite, ABC):
         """Method is called when character dies."""
         pass
 
+    @property
+    @abstractmethod
+    def body_color(self) -> tuple:
+        """Returns the character's body color."""
+        pass
+
     def update(self, *args: Any, **kwargs: Any) -> None:
         """Method updates food object."""
         # movement
@@ -254,3 +259,15 @@ class Character(pygame.sprite.Sprite, ABC):
 
         # animations
         self._moving_animation.update()
+
+        # update body color
+        self.image = self.update_body_color()
+        return None
+
+    def update_body_color(self) -> pygame.Surface:
+        """Method updates the character's body color."""
+        # update the copy - because of layers and transparency!
+        image_cpy = copy(self.image)
+        self._body_color_surface.fill(self.body_color)
+        image_cpy.blit(self._body_color_surface, self._body_color_surface.get_rect(), special_flags=pygame.BLEND_RGBA_ADD)
+        return image_cpy

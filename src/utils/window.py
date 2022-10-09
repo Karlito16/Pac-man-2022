@@ -20,16 +20,25 @@ def calculate_grid_dimensions(grid_size: tuple[int, int]) -> tuple[int, int, int
     return grid_width, grid_height, grid_slot_size
 
 
-def scale_image(img: pygame.Surface, relevant_size: float) -> pygame.Surface:
+def scale_image(img: pygame.Surface, relevant_size: float = None, angle: float = None, smoothscale: bool = True) -> pygame.Surface:
     """Scales the image object to the relevant size."""
     current_size = img.get_size()[0]
-    return pygame.transform.rotozoom(img, 0, relevant_size / current_size)
+    # smoothscale function uses real size value, whereas rotozoom uses percentage of the given size
+    # rotozoom is bad! -> using rotate instead!
+    size = relevant_size if smoothscale and relevant_size else relevant_size / current_size if relevant_size else current_size
+    func, *args = (pygame.transform.smoothscale, img, (size, size)) if smoothscale else (pygame.transform.rotate, img, angle)
+    return func(*args)
 
 
-def scale_images(*args: pygame.Surface, relevant_size: float) -> Generator[pygame.Surface, ]:
+def scale_images(*args: pygame.Surface, relevant_size: float = None, angle: float = None, smoothscale: bool = True) -> Generator[pygame.Surface]:
     """Same as scale_image function."""
     for img in args:
-        yield scale_image(img=img, relevant_size=relevant_size)
+        yield scale_image(img=img, relevant_size=relevant_size, angle=angle, smoothscale=smoothscale)
+
+
+def rotate_images(*args: pygame.Surface, angle: float, relevant_size: float = None) -> Generator[pygame.Surface]:
+    """Rotates the given pygame surfaces for given angle value."""
+    return scale_images(*args, relevant_size=relevant_size, angle=angle, smoothscale=False)
 
 
 def get_trajectory(start_point: tuple[float, float], end_point: tuple[float, float]) -> Callable:

@@ -17,14 +17,14 @@ class PacmanDyingAnimation(Animation):
 
     def __init__(self, instance: pygame.sprite.Sprite, callback_function: Callable):
         """Constructor."""
-        self._attr_name = utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value["death"]
+        # self._attr_name = utils.CHARACTER_ANIMATION_IMAGES_ATTR_NAMES.value["death"]
         self._callback_function = callback_function
         super().__init__(
             instance=instance,
             counter=utils.Counter,
             init_value=0,
             count_from=0,
-            count_to=len(getattr(instance, self._attr_name)),
+            count_to=len(instance.get_character_body_assets()),
             count_speed=utils.CHARACTER_MOVING_ANIMATION_SPEED.value,
             step_function=self.step_function,
             resolve_function=self.resolve_function,
@@ -40,7 +40,8 @@ class PacmanDyingAnimation(Animation):
 
     def update_image(self) -> None:
         """Updates the instance.image object."""
-        self.instance.image = getattr(self.instance, self._attr_name)[self.value]
+        # self.instance.image = getattr(self.instance, self._attr_name)[self.value]
+        self.instance.image = self.instance.get_character_body_assets()[self.value]
         return None
 
     def update_rect(self) -> None:

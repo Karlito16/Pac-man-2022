@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+import pygame
+
 from .character import Character
 from .character_type import CharacterType
 from src.map.components.elementary import MapParticles
@@ -21,15 +23,31 @@ class Pacman(Character):
     def __init__(self, starting_node):
         """Constructor."""
         super().__init__(
+            name=utils.CHARACTER_PACMAN_NAME.value,
             starting_node=starting_node,
             character_type=CharacterType.PACMAN,
-            moving_speed_percentage=utils.CHARACTER_PACMAN_MOVING_SPEED_PERCENTAGE.value
+            moving_speed_percentage=utils.CHARACTER_PACMAN_MOVING_SPEED_PERCENTAGE.value,
+            body_assets_dir=utils.CHARACTERS_PACMAN_BODY_DIR.value
         )
+        self._init_pacman_body_assets()
         self._reinit()
         self._score = 0
         self._num_of_coins_collected = 0
         self._lives = utils.CHARACTER_PACMAN_LIVES.value
         self._boosted = False
+        self._body_color = utils.add_transparency(color=utils.color_hex_to_tuple(color_hex=utils.COLORS_PACMAN.value))
+
+    def _init_pacman_body_assets(self) -> None:
+        """Inits the pacman body assets, depending on possible moving direciton or death."""
+        self._pacman_body_assets = dict()
+        for direction, angle in utils.DIRECTION_ANGLE.value.items():
+            self._pacman_body_assets[direction] = list(utils.rotate_images(*super().get_character_body_assets(), angle=angle, relevant_size=self.relevant_size))
+        self._pacman_body_assets[utils.CHARACTER_DEATH_KEYWORD.value] = utils.import_assets(
+            instance=self,
+            directory=utils.CHARACTERS_PACMAN_DEATH_DIR.value,
+            relevant_size=self.relevant_size,
+        )
+        return None
 
     def _reinit(self) -> None:
         """Overrides in Character."""
@@ -63,6 +81,11 @@ class Pacman(Character):
     def boosted(self, other: bool) -> None:
         """Getter."""
         self._boosted = other
+
+    @property
+    def body_color(self) -> tuple:
+        """Overrides in Character."""
+        return self._body_color
 
     def has_future_move(self) -> bool:
         """Method returns if character is about to change it's direction."""
@@ -99,6 +122,14 @@ class Pacman(Character):
             super(Pacman, self.__class__).moving_direction.fset(self, other)
         else:
             self._set_future_move(future_move=other)
+
+    def get_character_body_assets(self) -> list[pygame.image] | None:
+        """Overrides in Character."""
+        try:
+            key = utils.CHARACTER_DEATH_KEYWORD.value if self._dying else self.moving_direction
+            return self._pacman_body_assets[key]
+        except AttributeError:
+            return super().get_character_body_assets()
 
     def intersection(self) -> None:
         """Overrides in Character."""
@@ -146,6 +177,8 @@ class Pacman(Character):
         """Overrides the method from the Character class."""
         if self._dying:
             self._dying_animation.update()
+            self.image = self.update_body_color()
         else:
             super().update(args, kwargs)
             self.eat()
+        return None

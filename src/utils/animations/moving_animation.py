@@ -21,7 +21,7 @@ class MovingAnimation(Animation):
             counter=utils.CycleCounter,
             init_value=0,
             count_from=0,
-            count_to=len(getattr(instance, instance.current_animation_assets_attr_name)),
+            count_to=len(instance.get_character_body_assets()),
             count_speed=utils.CHARACTER_MOVING_ANIMATION_SPEED.value,
             step_function=self.step_function,
             resolve_function=self.resolve_function,
@@ -31,7 +31,7 @@ class MovingAnimation(Animation):
 
     def update_image(self) -> None:
         """Updates the instance.image object."""
-        self.instance.image = getattr(self.instance, self.instance.current_animation_assets_attr_name)[self.value]
+        self.instance.image = self.instance.get_character_body_assets()[self.value]
         return None
 
     def update_rect(self) -> None:

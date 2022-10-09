@@ -43,8 +43,8 @@ def load_images(directory: str, directory_constraints: list[str, ] = None, wshad
             yield pygame.image.load(f"{directory}\\{img_file}").convert_alpha()
 
 
-def import_assets(instance: Any, attr_name: str, directory: str, relevant_size: float = 1.0, directory_constraints: list[str, ] = None, wshadow: bool = False) -> None | ValueError:
-    """Imports the assets from given directory."""
+def import_assets(instance: Any, directory: str, attr_name: str = None, relevant_size: float = 1.0, directory_constraints: list[str, ] = None, wshadow: bool = False, smoothscale: bool = True) -> list[pygame.image] | None | ValueError:
+    """Imports the assets from the given directory."""
     # load the assets images
     loaded_images = list(load_images(directory=directory, directory_constraints=directory_constraints, wshadow=wshadow))
     # check asset number
@@ -53,8 +53,10 @@ def import_assets(instance: Any, attr_name: str, directory: str, relevant_size: 
     # scale the images
     scaled_images = utils.scale_images(*loaded_images, relevant_size=relevant_size)
     # set attribute
-    setattr(instance, attr_name, list(scaled_images))
-    return None
+    if attr_name:
+        setattr(instance, attr_name, list(scaled_images))
+        return None
+    return list(scaled_images)
 
 
 def color_hex_to_tuple(color_hex: str) -> tuple:
@@ -66,3 +68,16 @@ def color_hex_to_tuple(color_hex: str) -> tuple:
     return tuple(
         [int('0x' + color_hex[offset * i: offset * i + offset], 16) for i in range(length // 2)]
     )
+
+
+def add_transparency(color: tuple, alpha: int = 0) -> tuple:
+    """Adds the alpha value to the color."""
+    if len(color) == 4:
+        return color
+
+    elif len(color) != 3:
+        raise ValueError("Invalid color!")
+
+    if 0 <= alpha <= 255:
+        return color + (alpha, )
+    raise ValueError("Invalid alpha value!")

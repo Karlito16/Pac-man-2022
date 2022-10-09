@@ -18,6 +18,12 @@ DIRECTIONS_COORDINATES_DIFFERENCE = PacmanConstant({
     Directions.LEFT: (-1, 0),  # left
     Directions.UNDEFINED: (0, 0)
 })
+DIRECTION_ANGLE = PacmanConstant({  # in relation to default direction, which is LEFT
+    Directions.TOP: 270,
+    Directions.RIGHT: 180,
+    Directions.BOTTOM: 90,
+    Directions.LEFT: 0
+})
 
 # OTHER
 COLORS_ALPHA_MIN = PacmanConstant(255)
